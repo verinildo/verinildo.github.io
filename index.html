@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seleção e Posicionamento de Difusor Quadrado - ADLQ</title>
+  <style>
+    :root{
+      --bg:#0f172a; --panel:#111827; --card:#1e293b; --ink:#e5e7eb; --muted:#94a3b8;
+      --accent:#38bdf8; --accent2:#22c55e; --danger:#ef4444; --warn:#f59e0b; --line:#334155;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0b1120;color:var(--ink)}
+    .app{display:grid;grid-template-columns:minmax(310px,1fr) 2fr;min-height:100vh}
+    aside{background:var(--panel);border-right:1px solid var(--line);padding:18px;overflow:auto;max-height:100vh}
+    main{padding:18px;overflow:auto}
+    h1{font-size:20px;margin:0 0 6px;color:#fff}
+    .sub{font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:16px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:4px}
+    input,select{width:100%;padding:9px 10px;border:1px solid #334155;border-radius:10px;background:#0f172a;color:#fff;outline:none}
+    input:focus,select:focus{border-color:var(--accent)}
+    .field{margin-bottom:10px}.full{grid-column:1/-1}
+    .checkline{display:flex;align-items:center;gap:8px;font-size:12px;color:#cbd5e1;margin:4px 0 10px}
+    .checkline input{width:auto}
+    button{width:100%;border:0;border-radius:12px;padding:11px 14px;background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;font-weight:700;cursor:pointer;margin-top:8px}
+    button.secondary{background:#334155}.cards{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 10px 25px rgba(0,0,0,.18)}
+    .card small{display:block;color:var(--muted);font-size:11px}.card strong{font-size:19px;color:#fff}.ok{color:var(--accent2)}.bad{color:var(--danger)}.warn{color:var(--warn)}
+    .canvasWrap{background:#e2e8f0;border-radius:18px;padding:16px;min-height:560px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    svg{width:100%;height:70vh;min-height:520px;display:block;background:#f8fafc;border-radius:14px;border:1px solid #cbd5e1}
+    .table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;background:#0f172a;border-radius:12px;overflow:hidden}
+    .table th,.table td{border-bottom:1px solid #334155;padding:7px;text-align:center}.table th{background:#1e293b;color:#fff}.table td:first-child{text-align:left}
+    .note{font-size:11px;color:#94a3b8;line-height:1.4;margin-top:12px}.pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#172554;color:#bfdbfe;font-size:11px;margin:2px}
+    @media(max-width:900px){.app{grid-template-columns:1fr}aside{max-height:none}.cards{grid-template-columns:1fr 1fr}svg{height:60vh}}
+    @media print{body{background:#fff}.app{display:block}aside{display:none}main{padding:0}.cards{display:none}.canvasWrap{box-shadow:none;padding:0}svg{height:96vh;border:0}.noPrint{display:none}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1>Difusor quadrado ADLQ</h1>
+    <div class="sub">Planta baixa + cálculo automático de vazão pela movimentação/h do ambiente + pré-seleção com base na tabela Feff dos difusores quadrados TROX ADLQ/ADLR.</div>
+
+    <div class="grid">
+      <div class="field"><label>Largura da sala (m)</label><input id="largura" type="number" step="0.01" value="5.00"></div>
+      <div class="field"><label>Comprimento da sala (m)</label><input id="comprimento" type="number" step="0.01" value="7.00"></div>
+      <div class="field"><label>Pé direito (m)</label><input id="pe" type="number" step="0.01" value="3.00"></div>
+      <div class="field full"><label>Tipo de sala / ambiente (NBR 7256)</label><select id="tipo"></select></div>
+      <div class="field"><label>Movimentações por hora</label><input id="ach" type="number" step="0.1" value="12"></div>
+      <div class="field"><label>Nº de difusores</label><input id="nDif" type="number" min="1" max="64" step="1" value="4"></div>
+      <div class="field full"><label>Distância do difusor até parede/encontro do jato L (m)</label><input id="dist" type="number" step="0.01" value="2.00"></div>
+      <div class="field"><label>Ruído máximo desejado dB(A)</label><input id="ruido" type="number" step="1" value="35"></div>
+      <div class="field"><label>Velocidade terminal desejada (m/s)</label><input id="vterm" type="number" step="0.01" value="0.25"></div>
+      <div class="field"><label>ΔT insuflamento/ambiente (°C)</label><input id="dtz" type="number" step="0.1" value="10"></div>
+      <div class="field"><label>Modelo</label><select id="modelo"><option value="ADLQ">ADLQ</option><option value="ADLQ-AK">ADLQ-AK c/ plenum</option></select></div>
+    </div>
+    <label class="checkline"><input id="mostrarGrade" type="checkbox" onchange="calcular()"> Mostrar grade auxiliar de 1 m</label>
+    <button onclick="calcular()">Atualizar cálculo e planta</button>
+    <button class="secondary" onclick="window.print()">Imprimir planta em PDF</button>
+
+    <table class="table" id="tabela"></table>
+    <div class="note">Critério: vazão total = largura × comprimento × pé direito × número de movimentações por hora. Vazão por difusor = vazão total / nº de difusores. Velocidade efetiva = V/(Feff×3600). A seleção considera tamanhos 1 a 8 e prioriza atender ruído, velocidade efetiva e alcance informado.</div>
+  </aside>
+
+  <main>
+    <div class="cards noPrint">
+      <div class="card"><small>Vazão total estimada</small><strong id="vazTotal">-</strong></div>
+      <div class="card"><small>Vazão por difusor</small><strong id="vazDif">-</strong></div>
+      <div class="card"><small>Difusor sugerido</small><strong id="sugestao">-</strong></div>
+      <div class="card"><small>Status</small><strong id="status">-</strong></div>
+    </div>
+    <div class="canvasWrap">
+      <svg id="svg" viewBox="0 0 1000 700" role="img" aria-label="Planta baixa com difusores"></svg>
+    </div>
+  </main>
+</div>
+
+<script>
+const sizes = [
+  {tam:1, d:192, feff:0.0104, corr:-2},
+  {tam:2, d:248, feff:0.0185, corr:-2},
+  {tam:3, d:304, feff:0.0297, corr:-1},
+  {tam:4, d:360, feff:0.0440, corr:0},
+  {tam:5, d:416, feff:0.0628, corr:0},
+  {tam:6, d:446, feff:0.0728, corr:0},
+  {tam:7, d:546, feff:0.1175, corr:4},
+  {tam:8, d:571, feff:0.1280, corr:5}
+];
+
+const ambientes7256 = [{"ambiente": "Recepção da emergência / Sala de espera", "ach": 12.0}, {"ambiente": "Sala de triagem médica e/ou de enfermagem", "ach": 12.0}, {"ambiente": "Sala para atendimento de emergências", "ach": 6.0}, {"ambiente": "Sala de observação e diagnóstico de risco de infecção com antecâmara", "ach": 6.0}, {"ambiente": "Sala de inalação", "ach": 10.0}, {"ambiente": "Sala de procedimentos invasivos", "ach": 5.0}, {"ambiente": "Sala de atendimento de emergência (sala vermelha)", "ach": 25.0}, {"ambiente": "Sala de higienização / descontaminação", "ach": 12.0}, {"ambiente": "Recepção geral", "ach": 6.0}, {"ambiente": "Corredor de acesso aos quartos PE como antecâmara", "ach": 12.0}, {"ambiente": "Quarto (PE) com antecâmara para pacientes imunocomprometidos de alto risco / Isolamento para pacientes transplantados (alogênicos e autólogos/TMO)", "ach": 12.0}, {"ambiente": "Quarto (PE) sem antecâmara para pacientes imunocomprometidos de alto risco / Isolamento para pacientes transplantados (autólogos)", "ach": 12.0}, {"ambiente": "Quarto All sem recirculação, com antecâmara", "ach": 12.0}, {"ambiente": "Quarto All com recirculação – com antecâmara", "ach": 12.0}, {"ambiente": "Unidades de tratamento intensivo (não limitada a UCO, UTI e UTI Neonatal)", "ach": 6.0}, {"ambiente": "Unidades de tratamento intensivo All, com antecâmara", "ach": 6.0}, {"ambiente": "Enfermaria neonatal / Lactente de cuidados intermediários", "ach": 6.0}, {"ambiente": "Internação – quarto individual", "ach": 6.0}, {"ambiente": "Enfermaria / área coletiva de tratamento (exceto neonatologia)", "ach": 6.0}, {"ambiente": "Sala de fisioterapia", "ach": 6.0}, {"ambiente": "Corredor de acesso aos quartos de pacientes queimados expostos", "ach": 6.0}, {"ambiente": "Quarto ou enfermaria para pacientes queimados expostos e UTQ - com ou sem antecâmara", "ach": 6.0}, {"ambiente": "Quarto ou enfermaria para pacientes queimados não expostos", "ach": 6.0}, {"ambiente": "Sala para tratamento de balneoterapia", "ach": 6.0}, {"ambiente": "Sala de exames e curativos", "ach": 6.0}, {"ambiente": "Corredor/ circulação do centro cirúrgico", "ach": 6.0}, {"ambiente": "Sala, área de indução anestésica", "ach": 6.0}, {"ambiente": "Antessala acesso à sala cirúrgica", "ach": 25.0}, {"ambiente": "Sala de cirurgia", "ach": 25.0}, {"ambiente": "Sala de procedimento", "ach": 15.0}, {"ambiente": "Sala de apoio às cirurgias especializadas", "ach": 25.0}, {"ambiente": "Sala/ área de recuperação anestésica", "ach": 6.0}, {"ambiente": "Sala de guarda e preparo de anestésicos (centro cirúrgico)", "ach": 8.0}, {"ambiente": "Área para recepção, área para lavagem e separação de materiais", "ach": 6.0}, {"ambiente": "Área de desinfecção química líquida", "ach": 10.0}, {"ambiente": "Área(s) para preparo de materiais e roupa limpa para esterilização física", "ach": 12.0}, {"ambiente": "Sala de esterilização química gasosa e sala de aeração para ETO", "ach": 5.0}, {"ambiente": "Sala de armazenagem e distribuição de materiais e roupas esterilizados", "ach": 12.0}, {"ambiente": "Sala de exame e procedimento hemodinâmico", "ach": 20.0}, {"ambiente": "Área de indução e recuperação pós-anestésica", "ach": 6.0}, {"ambiente": "Área para limpeza e desinfecção de endoscópios", "ach": 10.0}, {"ambiente": "Salas de exame para endoscopia digestiva e colonoscopia / Sala de ENEMA", "ach": 6.0}, {"ambiente": "Sala de exame de broncoscopia, coleta de escarro e área de administração de pentamidina", "ach": 12.0}, {"ambiente": "Sala de recuperação pós-anestésica (endoscopia e colonoscopia)", "ach": 6.0}, {"ambiente": "Anatomia patológica e de macroscopia/ microscopia local de análise, lavagem, área de armazenamento de peças", "ach": 10.0}, {"ambiente": "Sala de necrópsia (área de exames e guarda temporária de cadáveres)", "ach": 12.0}, {"ambiente": "Sala de banco de tecidos com cabines de segurança biológica", "ach": 6.0}, {"ambiente": "Sala de banco de tecidos (músculos e ossos)", "ach": 15.0}, {"ambiente": "Laboratório de biologia molecular com cabines de segurança biológica", "ach": 12.0}, {"ambiente": "Sala de processamento de sangue e sala para procedimentos especiais", "ach": 6.0}, {"ambiente": "Sala para tratamento hemodialítico", "ach": 6.0}, {"ambiente": "Salas de reprocessamento de dialisadores", "ach": 10.0}, {"ambiente": "Laboratório de manipulação e estoque de fontes em uso", "ach": 6.0}, {"ambiente": "Laboratório de radioimunoensaio", "ach": 6.0}, {"ambiente": "Sala de exame/tratamento (gama – câmara de cintilografia)", "ach": 6.0}, {"ambiente": "Sala de simulação / Sala de terapia (braquiterapia não invasiva)", "ach": 6.0}, {"ambiente": "Sala de terapia (braquiterapia invasiva)", "ach": 20.0}, {"ambiente": "Sala de terapia (bomba de cobalto, acelerador linear e orovoltagem)", "ach": 6.0}, {"ambiente": "Sala de espera", "ach": 12.0}, {"ambiente": "Sala de raio X", "ach": 6.0}, {"ambiente": "Sala de raio X (cirurgia, cuidados críticos e cateterismo)", "ach": 15.0}, {"ambiente": "Sala de manipulação de nutrição parenteral com cabine de segurança biológica", "ach": 25.0}, {"ambiente": "Sala de preparo de quimioterápicos com cabine de segurança biológica", "ach": 6.0}, {"ambiente": "Área para dispensação (farmácia satélite)", "ach": 4.0}, {"ambiente": "Sala de preparo fracionamento de doses e reconstituição de medicamento com antecâmara", "ach": 6.0}, {"ambiente": "Sala de limpeza e higienização de insumos para manipulação parenteral", "ach": 20.0}, {"ambiente": "Área para armazenagem e controle", "ach": 12.0}, {"ambiente": "Sala de manipulação e envase", "ach": 6.0}, {"ambiente": "Área para preparo e envase de fórmulas lácteas e não lácteas", "ach": 6.0}, {"ambiente": "Sala para recebimento, pesagem, classificação e lavagem (área suja)", "ach": 10.0}, {"ambiente": "Sala de processamento (centrifugação, secagem)", "ach": 10.0}, {"ambiente": "Área de preparo de roupa limpa, costura, passagem, separação e dobragem", "ach": 20.0}, {"ambiente": "Área de armazenagem e distribuição de roupa limpa", "ach": 2.0}, {"ambiente": "Sala do gerador de ozônio", "ach": 10.0}, {"ambiente": "Armazenagem de resíduos contaminados / Armazenagem de substâncias perigosas/tóxicas", "ach": 10.0}, {"ambiente": "Sala de parto natural", "ach": 15.0}, {"ambiente": "Sala de exames (Unidades de diagnósticos e terapia)", "ach": 6.0}, {"ambiente": "Sala de simulação/salas de terapia", "ach": 6.0}, {"ambiente": "Área de exercícios para fisioterapia", "ach": 6.0}, {"ambiente": "Vestiários de barreira", "ach": 10.0}, {"ambiente": "Sala de exame/consultório", "ach": 6.0}, {"ambiente": "Sala de utilidades/Expurgo", "ach": 10.0}, {"ambiente": "Depósito de material de limpeza", "ach": 10.0}, {"ambiente": "Sala de espera (odontológica)", "ach": 6.0}, {"ambiente": "Sala de tratamento dentário", "ach": 6.0}, {"ambiente": "Sala de lavagem/esterilização de materiais", "ach": 6.0}];
+
+function popularAmbientes(){
+  const select = document.getElementById('tipo');
+  select.innerHTML = ambientes7256.map((item,idx)=>`<option value="${idx}">${item.ambiente} - ${fmt(item.ach,0)} mov/h</option>`).join('') + `<option value="custom">Personalizado</option>`;
+  const idxSalaCirurgia = ambientes7256.findIndex(i => i.ambiente.toLowerCase() === 'sala de cirurgia');
+  select.value = idxSalaCirurgia >= 0 ? String(idxSalaCirurgia) : '0';
+  aplicarAmbienteSelecionado();
+}
+
+function aplicarAmbienteSelecionado(){
+  const select = document.getElementById('tipo');
+  if(select.value !== 'custom'){
+    const item = ambientes7256[Number(select.value)];
+    if(item) document.getElementById('ach').value = item.ach;
+  }
+}
+
+
+function val(id){ return parseFloat(document.getElementById(id).value)||0; }
+function setTxt(id,txt,cls){ const el=document.getElementById(id); el.textContent=txt; el.className=cls||''; }
+function fmt(n,d=2){ return Number(n).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+
+document.getElementById('tipo').addEventListener('change', e=>{
+  aplicarAmbienteSelecionado();
+  calcular();
+});
+document.querySelectorAll('input,select').forEach(el=>el.addEventListener('input', calcular));
+
+function ruidoEstimado(veff, tam, modelo){
+  // Aproximação digital para pré-seleção, inspirada nas curvas de ruído x Veff do catálogo.
+  let base = modelo === 'ADLQ-AK' ? 20 : 24;
+  let ln = base + 18 * Math.log10(Math.max(veff,0.5)) + (tam-4)*0.7;
+  return Math.max(15, ln);
+}
+function alcanceEstimado(veff, vterm){
+  // Relação prática aproximada: maior Veff gera maior alcance para mesma velocidade terminal.
+  return Math.max(0.5, 0.95 * veff / Math.max(vterm,0.1));
+}
+function pressaoEstimativa(veff, modelo){
+  const k = modelo === 'ADLQ-AK' ? 0.55 : 0.42;
+  return Math.max(0.3, k * veff * veff);
+}
+
+function calcular(){
+  const largura=val('largura'), comp=val('comprimento'), pe=val('pe'), ach=val('ach');
+  const n=Math.max(1,Math.round(val('nDif'))), dist=val('dist'), ruidoMax=val('ruido'), vterm=val('vterm'), dtz=val('dtz');
+  const modelo=document.getElementById('modelo').value;
+  const volume=largura*comp*pe;
+  const vazTotal=volume*ach;
+  const vazDif=vazTotal/n;
+  const rows=sizes.map(s=>{
+    const veff=vazDif/(s.feff*3600);
+    const ruido=ruidoEstimado(veff,s.tam,modelo)+s.corr;
+    const alcance=alcanceEstimado(veff,vterm);
+    const dp=pressaoEstimativa(veff,modelo);
+    const dtl=(0.08 + 0.02*Math.max(0,veff-3))*dtz;
+    const atende = ruido<=ruidoMax && alcance>=dist && veff>=1.5 && veff<=7.5;
+    return {...s,veff,ruido,alcance,dp,dtl,atende};
+  });
+  let best = rows.find(r=>r.atende) || rows.slice().sort((a,b)=>{
+    const pa = Math.abs(a.alcance-dist)*3 + Math.max(0,a.ruido-ruidoMax)*2 + Math.max(0,a.veff-7.5)*4;
+    const pb = Math.abs(b.alcance-dist)*3 + Math.max(0,b.ruido-ruidoMax)*2 + Math.max(0,b.veff-7.5)*4;
+    return pa-pb;
+  })[0];
+  setTxt('vazTotal', fmt(vazTotal,0)+' m³/h');
+  setTxt('vazDif', fmt(vazDif,0)+' m³/h');
+  setTxt('sugestao', modelo+' tam. '+best.tam);
+  setTxt('status', best.atende?'Atende':'Verificar', best.atende?'ok':'warn');
+  montarTabela(rows,best);
+  desenharPlanta(largura,comp,n,dist,best,vazDif);
+}
+
+function montarTabela(rows,best){
+  let html='<tr><th>Tam.</th><th>D mm</th><th>Feff</th><th>Veff</th><th>L est.</th><th>Ruído</th><th>Δp</th><th></th></tr>';
+  rows.forEach(r=>{
+    html += `<tr style="${r.tam===best.tam?'outline:2px solid #38bdf8':''}"><td>ADLQ ${r.tam}</td><td>${r.d}</td><td>${r.feff.toFixed(4)}</td><td>${fmt(r.veff,2)}</td><td>${fmt(r.alcance,2)}</td><td>${fmt(r.ruido,0)}</td><td>${fmt(r.dp,1)}</td><td>${r.atende?'✅':'—'}</td></tr>`;
+  });
+  document.getElementById('tabela').innerHTML=html;
+}
+function layoutDifusores(w,h,n,dist){
+
+  // =====================================================
+  // LAYOUT INTELIGENTE CONSIDERANDO A PROPORÇÃO DA SALA
+  // =====================================================
+
+  const proporcao = h / w;
+
+  let cols = Math.ceil(Math.sqrt(n / proporcao));
+  let rows = Math.ceil(n / cols);
+
+  // -----------------------------------------------------
+  // AJUSTE AUTOMÁTICO PARA SALAS MAIS COMPRIDAS
+  // -----------------------------------------------------
+
+  if(h > w && cols > rows){
+    [cols, rows] = [rows, cols];
+  }
+
+  // -----------------------------------------------------
+  // AJUSTE AUTOMÁTICO PARA SALAS MAIS LARGAS
+  // -----------------------------------------------------
+
+  if(w > h && rows > cols){
+    [cols, rows] = [rows, cols];
+  }
+
+  const pts=[];
+
+  const usableW=Math.max(0.2,w-2*dist);
+  const usableH=Math.max(0.2,h-2*dist);
+
+  // -----------------------------------------------------
+  // ESPAÇAMENTOS
+  // -----------------------------------------------------
+
+  const stepX = cols===1 ? 0 : usableW/(cols-1);
+  const stepY = rows===1 ? 0 : usableH/(rows-1);
+
+  let contador = 0;
+
+  for(let r=0;r<rows;r++){
+
+    for(let c=0;c<cols;c++){
+
+      if(contador>=n) break;
+
+      const x = cols===1
+        ? w/2
+        : dist + c*stepX;
+
+      const y = rows===1
+        ? h/2
+        : dist + r*stepY;
+
+      pts.push({x,y});
+
+      contador++;
+    }
+  }
+
+  return {pts,cols,rows};
+}
+
+
+function desenharPlanta(w,h,n,dist,best,vazDif){
+  const svg=document.getElementById('svg'); svg.innerHTML='';
+  const margin=70, W=1000, H=700;
+  const scale=Math.min((W-2*margin)/w,(H-2*margin)/h);
+  const pw=w*scale, ph=h*scale, ox=(W-pw)/2, oy=(H-ph)/2;
+  const add=(tag,attrs,parent=svg)=>{const el=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));parent.appendChild(el);return el;};
+  add('rect',{x:0,y:0,width:W,height:H,fill:'#f8fafc'});
+  add('rect',{x:ox,y:oy,width:pw,height:ph,fill:'#eef2ff',stroke:'#0f172a','stroke-width':4,rx:4});
+  // grade auxiliar de 1 m (opcional)
+  const mostrarGrade = document.getElementById('mostrarGrade')?.checked;
+  if(mostrarGrade){
+    for(let gx=0; gx<=w; gx++){
+      add('line',{x1:ox+gx*scale,y1:oy,x2:ox+gx*scale,y2:oy+ph,stroke:'#cbd5e1','stroke-width':1});
+    }
+    for(let gy=0; gy<=h; gy++){
+      add('line',{x1:ox,y1:oy+gy*scale,x2:ox+pw,y2:oy+gy*scale,stroke:'#cbd5e1','stroke-width':1});
+    }
+  }
+  add('text',{x:W/2,y:32,'text-anchor':'middle','font-size':20,'font-weight':700,fill:'#0f172a'}).textContent=`Planta baixa - ${fmt(w,2)} m × ${fmt(h,2)} m`;
+  add('text',{x:W/2,y:58,'text-anchor':'middle','font-size':13,fill:'#334155'}).textContent=`${n} difusor(es) | ${fmt(vazDif,0)} m³/h por difusor | Sugerido: ADLQ tam. ${best.tam}`;
+  // cotas externas
+  add('line',{x1:ox,y1:oy+ph+32,x2:ox+pw,y2:oy+ph+32,stroke:'#0f172a','stroke-width':2});
+  add('text',{x:ox+pw/2,y:oy+ph+55,'text-anchor':'middle','font-size':14,fill:'#0f172a'}).textContent=`Largura: ${fmt(w,2)} m`;
+  add('line',{x1:ox-32,y1:oy,x2:ox-32,y2:oy+ph,stroke:'#0f172a','stroke-width':2});
+  add('text',{x:ox-45,y:oy+ph/2,'text-anchor':'middle','font-size':14,fill:'#0f172a',transform:`rotate(-90 ${ox-45} ${oy+ph/2})`}).textContent=`Comprimento: ${fmt(h,2)} m`;
+
+  const {pts,cols,rows}=layoutDifusores(w,h,n,dist);
+  const ds=Math.max(18, Math.min(44, best.d/1000*scale));
+  pts.forEach((p,i)=>{
+    const x=ox+p.x*scale, y=oy+p.y*scale;
+    add('circle',{cx:x,cy:y,r:dist*scale,fill:'none',stroke:'#38bdf8','stroke-width':2,'stroke-dasharray':'8 6',opacity:.65});
+    add('rect',{x:x-ds/2,y:y-ds/2,width:ds,height:ds,fill:'#0ea5e9',stroke:'#075985','stroke-width':2,rx:3});
+    add('line',{x1:x-ds/2,y1:y,x2:x+ds/2,y2:y,stroke:'#e0f2fe','stroke-width':2});
+    add('line',{x1:x,y1:y-ds/2,x2:x,y2:y+ds/2,stroke:'#e0f2fe','stroke-width':2});
+    add('text',{x:x,y:y+ds/2+16,'text-anchor':'middle','font-size':12,'font-weight':700,fill:'#0f172a'}).textContent=`D${i+1}`;
+    // cota até parede/encontro do jato
+    if(i===0){
+      add('line',{x1:ox,y1:y-22,x2:x,y2:y-22,stroke:'#ef4444','stroke-width':2,'marker-end':'url(#arrow)'});
+      add('text',{x:(ox+x)/2,y:y-28,'text-anchor':'middle','font-size':12,fill:'#991b1b'}).textContent=`${fmt(p.x,2)} m`;
+    }
+  });
+  if(pts.length>1){
+    const p0=pts[0], p1=pts[1] || pts[0];
+    if(Math.abs(p1.x-p0.x)>0.01){
+      const x1=ox+p0.x*scale, x2=ox+p1.x*scale, y=oy+p0.y*scale+42;
+      add('line',{x1,y1:y,x2,y2:y,stroke:'#16a34a','stroke-width':2});
+      add('text',{x:(x1+x2)/2,y:y+18,'text-anchor':'middle','font-size':12,fill:'#166534'}).textContent=`entre difusores: ${fmt(Math.abs(p1.x-p0.x),2)} m`;
+    }
+  }
+  add('text',{x:ox+12,y:oy+ph-14,'font-size':12,fill:'#334155'}).textContent=`Escala automática | Círculo tracejado = alcance/distância L informada (${fmt(dist,2)} m)`;
+}
+popularAmbientes();
+</script>
+</body>
+</html>
