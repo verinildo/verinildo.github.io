@@ -3,522 +3,1035 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cálculo de Vazão de Exaustão - Cozinha Profissional</title>
+  <title>Carta Psicrométrica</title>
   <style>
-    :root {
-      --bg: #f3f6fb;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #64748b;
-      --primary: #0f766e;
-      --primary-dark: #115e59;
-      --border: #d8e0ea;
-      --soft: #eef7f6;
-      --danger: #b91c1c;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
-    * { box-sizing: border-box; }
-
     body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.45;
+      background: #f3f6f9;
+      color: #1f2933;
+      padding: 20px;
     }
 
     .container {
-      width: min(1180px, calc(100% - 32px));
-      margin: 24px auto 60px;
+      max-width: 1300px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
     }
 
-    .topbar {
-      background: linear-gradient(135deg, var(--primary), #14b8a6);
-      color: white;
-      padding: 24px;
-      border-radius: 18px;
-      box-shadow: 0 12px 30px rgba(15, 118, 110, 0.20);
-      margin-bottom: 22px;
+    .panel, .chart-card, .tool-card {
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      padding: 20px;
     }
 
-    .topbar h1 {
-      margin: 0 0 8px;
+    h1 {
+      grid-column: 1 / -1;
       font-size: 28px;
+      margin-bottom: 5px;
+      color: #12324a;
     }
 
-    .topbar p { margin: 0; opacity: .95; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      align-items: start;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-      margin-bottom: 18px;
-    }
-
-    .card h2 {
-      font-size: 19px;
-      margin: 0 0 14px;
-      color: var(--primary-dark);
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+    .subtitle {
+      grid-column: 1 / -1;
+      margin-bottom: 10px;
+      color: #52606d;
     }
 
     label {
       display: block;
-      font-weight: 700;
-      font-size: 13px;
-      margin-bottom: 5px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 11px;
+      margin-top: 14px;
+      font-weight: bold;
       font-size: 14px;
-      background: #fff;
-      color: var(--text);
-      outline: none;
     }
 
-    textarea { min-height: 78px; resize: vertical; }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
-    }
-
-    .full { grid-column: 1 / -1; }
-
-    .hint {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .results {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .result-box {
-      background: var(--soft);
-      border: 1px solid #b7e3dd;
-      border-radius: 14px;
-      padding: 14px;
-    }
-
-    .result-box small {
-      display: block;
-      color: var(--muted);
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .result-box strong {
-      display: block;
-      font-size: 21px;
-      color: var(--primary-dark);
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #cbd5df;
+      border-radius: 8px;
+      font-size: 14px;
     }
 
     button {
-      border: 0;
-      border-radius: 12px;
-      padding: 11px 16px;
-      font-weight: 700;
-      cursor: pointer;
-      background: var(--primary);
+      background: #0b75b7;
       color: white;
-      transition: .2s;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 16px;
+      transition: 0.2s;
     }
 
-    button:hover { background: var(--primary-dark); transform: translateY(-1px); }
-    button.secondary { background: #334155; }
-    button.secondary:hover { background: #1e293b; }
-
-    .report {
-      background: white;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      padding: 26px;
+    button:hover {
+      background: #095f94;
     }
 
-    .report h1 {
-      text-align: center;
-      font-size: 21px;
-      margin: 0 0 20px;
-      text-transform: uppercase;
+    .secondary {
+      background: #607d8b;
     }
 
-    .report h3 {
-      margin: 22px 0 8px;
-      color: var(--primary-dark);
-      border-bottom: 1px solid #cbd5e1;
-      padding-bottom: 5px;
+    .secondary:hover {
+      background: #4b636e;
     }
 
-    .report p { margin: 6px 0; }
-    .report ul { margin-top: 6px; }
-    .formula {
-      background: #f8fafc;
-      border-left: 4px solid var(--primary);
-      padding: 10px 14px;
-      margin: 10px 0;
-      font-family: Consolas, monospace;
-      font-size: 14px;
+    .danger {
+      background: #c0392b;
     }
 
-    .signature {
-      margin-top: 46px;
-      text-align: center;
+    .danger:hover {
+      background: #922b21;
     }
 
-    .signature .line {
-      width: 320px;
-      border-top: 1px solid #111827;
-      margin: 0 auto 6px;
+    .point-list {
+      margin-top: 16px;
+      border-top: 1px solid #e0e6ed;
+      padding-top: 12px;
+      max-height: 260px;
+      overflow-y: auto;
     }
 
-    .warning {
-      color: var(--danger);
-      font-weight: 700;
+    .point-item {
+      background: #eef6fb;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
       font-size: 13px;
-      display: none;
-      margin-top: 10px;
+      border-left: 4px solid #0b75b7;
     }
 
-    @media (max-width: 850px) {
-      .grid { grid-template-columns: 1fr; }
-      .results { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
+    .chart-wrapper {
+      width: 100%;
+      overflow-x: auto;
     }
 
-    @media print {
-      body { background: white; }
-      .topbar, .input-area, .actions, .warning { display: none !important; }
-      .container { width: 100%; margin: 0; }
-      .grid { display: block; }
-      .report {
-        border: none;
-        box-shadow: none;
-        padding: 0;
+    canvas {
+      background: #ffffff;
+      border: 1px solid #d9e2ec;
+      border-radius: 10px;
+      width: 100%;
+      min-height: 620px;
+    }
+
+    .results {
+      margin-top: 15px;
+      font-size: 14px;
+      line-height: 1.5;
+      background: #f7fbff;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #d9eaf7;
+    }
+
+    .small-note {
+      font-size: 12px;
+      margin-top: 12px;
+      color: #6b7c8f;
+      line-height: 1.4;
+    }
+
+    .tools-grid {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .tool-card h2 {
+      color: #12324a;
+      margin-bottom: 8px;
+    }
+
+    .tool-card .result-box {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f7fbff;
+      border: 1px solid #d9eaf7;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
       }
-      @page { size: A4; margin: 16mm; }
     }
-  </style>
+  
+
+/* ===== Menu e padronização visual entre páginas ===== */
+:root{--nav-primary:#0f4fbf;--nav-dark:#0b2d75;--nav-bg:#f4f7fb;--nav-card:#ffffff;--nav-text:#172033;--nav-muted:#607086;--nav-border:#d8dee9;}
+.app-nav{position:sticky;top:0;z-index:999;background:linear-gradient(135deg,var(--nav-primary),var(--nav-dark));color:#fff;box-shadow:0 8px 24px rgba(15,23,42,.16);}
+.app-nav-inner{max-width:1300px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+.app-nav .brand{color:#fff;text-decoration:none;font-weight:800;letter-spacing:.2px;font-size:18px;white-space:nowrap;}
+.nav-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.nav-links a{color:#eaf1ff;text-decoration:none;font-weight:700;font-size:13px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);}
+.nav-links a:hover,.nav-links a.active{background:#fff;color:var(--nav-dark);}
+.card,.panel,.chart-card,.tool-card{border:1px solid var(--nav-border);box-shadow:0 8px 22px rgba(15,23,42,.06);}
+@media(max-width:760px){.app-nav-inner{align-items:flex-start;flex-direction:column}.nav-links{justify-content:flex-start}.nav-links a{font-size:12px;padding:7px 9px}}
+@media print{.app-nav{display:none!important}}
+
+
+/* Ajustes específicos da home para combinar com as demais páginas */
+body{background:#f4f7fb!important;color:#172033!important;padding:0!important;}
+.container{max-width:1300px!important;margin:22px auto!important;padding:0 16px 40px!important;}
+h1{color:#0b2d75!important;}
+.subtitle{color:#607086!important;}
+.panel,.chart-card,.tool-card{border-radius:16px!important;}
+button{background:#0f4fbf!important;border-radius:12px!important;}
+button:hover{filter:brightness(.95);}
+button.secondary{background:#0f766e!important;}
+button.danger{background:#b91c1c!important;}
+.point-item{border-left-color:#0f4fbf!important;background:#eef3ff!important;}
+.results,.tool-card .result-box{background:#f8fafc!important;border-color:#d8dee9!important;}
+</style>
 </head>
 <body>
-  <main class="container">
-    <section class="topbar">
-      <h1>Cálculo da Vazão de Exaustão para Cozinha Profissional</h1>
-      <p>Memorial automático com base em dados informados pelo usuário.</p>
-    </section>
 
-    <section class="grid">
-      <div class="input-area">
-        <div class="card">
-          <h2>1. Dados do Memorial</h2>
-          <div class="form-grid">
-            <div>
-              <label for="data">Data</label>
-              <input id="data" type="date" value="2025-06-04">
-            </div>
-            <div>
-              <label for="responsavel">Responsável Técnico</label>
-              <input id="responsavel" type="text" value="[Nome do engenheiro]">
-            </div>
-            <div class="full">
-              <label for="local">Local / descrição</label>
-              <input id="local" type="text" value="Pequeno restaurante com preparo de carnes, frituras e cocção contínua">
-            </div>
-            <div class="full">
-              <label for="norma">Norma base</label>
-              <input id="norma" type="text" value="ABNT NBR 14518:2019 – Sistemas de ventilação para cozinhas profissionais">
-            </div>
-          </div>
-        </div>
+<nav class="app-nav">
+  <div class="app-nav-inner">
+    <a class="brand" href="home.html">Seletores AVAC</a>
+    <div class="nav-links">
+      <a href="index.html" data-page="index.html">Home</a>
+      <a href="Difusor_Quadrado.html" data-page="Difusor_Quadrado.html">Difusor Quadrado</a>
+      <a href="Grelhas.html" data-page="Grelhas.html">Grelhas</a>
+      <a href="Sala_de_Cirurgia.html" data-page="Sala_de_Cirurgia.html">Sala de Cirurgia</a>
+      <a href="Arquitetura.html" data-page="Arquitetura.html">Arquitetura</a>
+    </div>
+  </div>
+</nav>
 
-        <div class="card">
-          <h2>2. Informações da Cozinha</h2>
-          <div class="form-grid">
-            <div>
-              <label for="areaCozinha">Área útil da cozinha (m²)</label>
-              <input id="areaCozinha" type="number" step="0.01" value="11.9">
-            </div>
-            <div>
-              <label for="peDireito">Pé-direito (m)</label>
-              <input id="peDireito" type="number" step="0.01" value="2.7">
-            </div>
-            <div>
-              <label for="horas">Funcionamento diário (h)</label>
-              <input id="horas" type="number" step="0.1" value="24">
-            </div>
-            <div>
-              <label for="volumeManual">Volume manual (opcional)</label>
-              <input id="volumeManual" type="number" step="0.01" placeholder="Deixe vazio para calcular">
-              <div class="hint">Se vazio: Volume = área × pé-direito.</div>
-            </div>
-          </div>
-        </div>
+  <div class="container">
+    <h1>Carta Psicrométrica Interativa</h1>
+    <p class="subtitle">Informe altitude, temperatura de bulbo seco e umidade relativa para plotar pontos e processos psicrométricos.</p>
 
-        <div class="card">
-          <h2>3. Equipamentos e Coifa</h2>
-          <div class="form-grid">
-            <div class="full">
-              <label for="equipamentos">Equipamentos de cocção</label>
-              <textarea id="equipamentos">Caldeira 500L 3x
-Caldeira 300L</textarea>
-            </div>
-            <div>
-              <label for="tipoCoifa">Tipo de coifa</label>
-              <select id="tipoCoifa">
-                <option value="Coifa central (ilha)" selected>Coifa central (ilha)</option>
-                <option value="Coifa de parede">Coifa de parede</option>
-                <option value="Coifa compensada">Coifa compensada</option>
-                <option value="Outro tipo de coifa">Outro tipo de coifa</option>
-              </select>
-            </div>
-            <div>
-              <label for="alturaCoifa">Altura da coifa à cocção (m)</label>
-              <input id="alturaCoifa" type="number" step="0.01" value="0.5">
-            </div>
-            <div>
-              <label for="larguraCoifa">Largura da coifa (m)</label>
-              <input id="larguraCoifa" type="number" step="0.01" value="6.6">
-            </div>
-            <div>
-              <label for="comprimentoCoifa">Comprimento da coifa (m)</label>
-              <input id="comprimentoCoifa" type="number" step="0.01" value="1.8">
-            </div>
-            <div>
-              <label for="areaCoifaManual">Área da coifa manual (opcional)</label>
-              <input id="areaCoifaManual" type="number" step="0.01" placeholder="Deixe vazio para calcular">
-              <div class="hint">Se vazio: Área = largura × comprimento.</div>
-            </div>
-            <div>
-              <label for="velocidade">Velocidade de captação (m/s)</label>
-              <input id="velocidade" type="number" step="0.01" value="0.5">
-              <div class="hint">Referência usual do memorial: 0,5 a 0,7 m/s.</div>
-            </div>
-          </div>
-        </div>
+    <aside class="panel">
+      <h2>Dados de entrada</h2>
 
-        <div class="card">
-          <h2>4. Ar de Reposição</h2>
-          <div class="form-grid">
-            <div>
-              <label for="reposicaoMin">Reposição mínima (%)</label>
-              <input id="reposicaoMin" type="number" step="1" value="70">
-            </div>
-            <div>
-              <label for="reposicaoMax">Reposição máxima (%)</label>
-              <input id="reposicaoMax" type="number" step="1" value="90">
-            </div>
-            <div class="full">
-              <label for="consideracoes">Considerações finais</label>
-              <textarea id="consideracoes">A vazão calculada atende à faixa recomendada para o critério adotado.
-Recomenda-se a instalação de um sistema de reposição de ar com filtragem e distribuição adequada para garantir conforto térmico e pressão neutra.
-Devem ser adotados filtros metálicos removíveis, caixa de gordura e inspeção nos dutos, com acesso para manutenção.</textarea>
-            </div>
-          </div>
+      <label for="altitude">Altitude do local (m)</label>
+      <input type="number" id="altitude" value="0" step="10" />
 
-          <p id="warning" class="warning">Verifique os valores informados. Todos os campos numéricos principais devem ser maiores que zero.</p>
+      <label for="temp">Temperatura de bulbo seco - TBS (°C)</label>
+      <input type="number" id="temp" value="24" step="0.1" />
 
-          <div class="actions">
-            <button onclick="calcular()">Calcular / Atualizar Relatório</button>
-            <button class="secondary" onclick="window.print()">Imprimir / Salvar em PDF</button>
-          </div>
-        </div>
+      <label for="rh">Umidade relativa (%)</label>
+      <input type="number" id="rh" value="55" min="1" max="100" step="0.1" />
+
+      <label style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:10px;">
+        <input type="checkbox" id="usePreviousW" onchange="togglePreviousW()" style="width:auto;margin:0;" />
+        Usar umidade absoluta do ponto anterior
+      </label>
+
+      <label for="pointName">Nome do ponto</label>
+      <input type="text" id="pointName" value="Ponto 1" />
+
+      <button onclick="addPoint()">Adicionar ponto ao processo</button>
+      <button class="secondary" onclick="drawChart()">Atualizar carta</button>
+      <button class="secondary" onclick="removeLastPoint()">Excluir último ponto</button>
+      <button class="danger" onclick="clearPoints()">Limpar processo</button>
+
+      <hr style="margin:18px 0;border:0;border-top:1px solid #d9e2ec;">
+
+      <h2>Carga térmica por Δh</h2>
+
+      <label for="airflow">Vazão de ar (m³/h)</label>
+      <input type="number" id="airflow" value="1000" step="10" />
+
+      <label for="pointA">Ponto inicial</label>
+      <select id="pointA"></select>
+
+      <label for="pointB">Ponto final</label>
+      <select id="pointB"></select>
+
+      <button onclick="calculateLoadTR()">Calcular carga em TR</button>
+      <button class="secondary" onclick="printChartPDF()">Imprimir carta em PDF</button>
+
+      <div class="point-list" id="pointList"></div>
+
+      <div class="results" id="results">
+        Nenhum ponto adicionado ainda.
       </div>
 
-      <div>
-        <div class="card">
-          <h2>Resultados</h2>
-          <div class="results">
-            <div class="result-box">
-              <small>Volume da cozinha</small>
-              <strong id="resVolume">-</strong>
-            </div>
-            <div class="result-box">
-              <small>Área da coifa</small>
-              <strong id="resAreaCoifa">-</strong>
-            </div>
-            <div class="result-box">
-              <small>Vazão de exaustão</small>
-              <strong id="resVazao">-</strong>
-            </div>
-            <div class="result-box">
-              <small>Ar de reposição</small>
-              <strong id="resReposicao">-</strong>
-            </div>
-          </div>
-        </div>
+      <div class="results" id="loadResults">
+        Adicione pelo menos dois pontos para calcular a carga térmica.
+      </div>
 
-        <article id="relatorio" class="report"></article>
+      <p class="small-note">
+        Modelo simplificado para estudo e pré-dimensionamento. A carta usa pressão atmosférica corrigida pela altitude, curvas de UR e razão de umidade.
+      </p>
+    </aside>
+
+    <main class="chart-card">
+      <div class="chart-wrapper">
+        <canvas id="chart" width="1000" height="650"></canvas>
+      </div>
+    </main>
+
+    <section class="tools-grid">
+      <div class="tool-card">
+        <h2>Calculadora de Temperatura de Insuflamento</h2>
+        <p class="small-note">Calcula a temperatura de insuflamento pela carga sensível da sala, vazão de ar e temperatura de retorno.</p>
+
+        <label for="supplyAirflow">Vazão de ar insuflado (m³/h)</label>
+        <input type="number" id="supplyAirflow" value="3000" step="10" />
+
+        <label for="roomSensibleLoad">Carga sensível da sala</label>
+        <input type="number" id="roomSensibleLoad" value="10" step="0.1" />
+
+        <label for="roomSensibleUnit">Unidade da carga sensível</label>
+        <select id="roomSensibleUnit">
+          <option value="TR">TR</option>
+          <option value="kW">kW</option>
+          <option value="kcalh">kcal/h</option>
+        </select>
+
+        <label for="returnTemp">Temperatura de retorno desejada (°C)</label>
+        <input type="number" id="returnTemp" value="24" step="0.1" />
+
+        <button onclick="calculateSupplyTemp()">Calcular temperatura de insuflamento</button>
+
+        <div class="result-box" id="supplyTempResult">Informe os dados e clique em calcular.</div>
+      </div>
+
+      <div class="tool-card">
+        <h2>Calculadora de Mistura de Ar</h2>
+        <p class="small-note">Calcula o ponto de mistura usando vazões, temperatura e umidade relativa de duas correntes de ar.</p>
+
+        <label for="mixAltitude">Altitude para o cálculo da mistura (m)</label>
+        <input type="number" id="mixAltitude" value="0" step="10" />
+
+        <label for="airflow1">Vazão do ar 1 (m³/h)</label>
+        <input type="number" id="airflow1" value="800" step="10" />
+
+        <label for="temp1">Temperatura do ar 1 (°C)</label>
+        <input type="number" id="temp1" value="32" step="0.1" />
+
+        <label for="rh1">Umidade relativa do ar 1 (%)</label>
+        <input type="number" id="rh1" value="85" step="0.1" />
+
+        <label for="airflow2">Vazão do ar 2 (m³/h)</label>
+        <input type="number" id="airflow2" value="3200" step="10" />
+
+        <label for="temp2">Temperatura do ar 2 (°C)</label>
+        <input type="number" id="temp2" value="22" step="0.1" />
+
+        <label for="rh2">Umidade relativa do ar 2 (%)</label>
+        <input type="number" id="rh2" value="55" step="0.1" />
+
+        <button onclick="calculateAirMixing()">Calcular ponto de mistura</button>
+
+        <div class="result-box" id="mixingResult">Informe os dados e clique em calcular.</div>
       </div>
     </section>
-  </main>
+  </div>
 
   <script>
-    const ids = [
-      'data', 'responsavel', 'local', 'norma', 'areaCozinha', 'peDireito', 'horas',
-      'volumeManual', 'equipamentos', 'tipoCoifa', 'alturaCoifa', 'larguraCoifa',
-      'comprimentoCoifa', 'areaCoifaManual', 'velocidade', 'reposicaoMin',
-      'reposicaoMax', 'consideracoes'
-    ];
+    const canvas = document.getElementById('chart');
+    const ctx = canvas.getContext('2d');
+    let points = [];
 
-    ids.forEach(id => {
-      document.addEventListener('DOMContentLoaded', () => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', calcular);
+    const chart = {
+      left: 70,
+      right: 960,
+      top: 40,
+      bottom: 580,
+      tMin: 0,
+      tMax: 50,
+      wMin: 0,
+      wMax: 0.030
+    };
+
+    function sensibleLoadToKW(value, unit) {
+      if (unit === 'TR') return value * 3.5168525;
+      if (unit === 'kcalh') return value * 0.001163;
+      return value;
+    }
+
+    function calculateSupplyTemp() {
+      const airflow = parseFloat(document.getElementById('supplyAirflow').value);
+      const loadValue = parseFloat(document.getElementById('roomSensibleLoad').value);
+      const unit = document.getElementById('roomSensibleUnit').value;
+      const returnTemp = parseFloat(document.getElementById('returnTemp').value);
+      const result = document.getElementById('supplyTempResult');
+
+      if (isNaN(airflow) || airflow <= 0 || isNaN(loadValue) || loadValue < 0 || isNaN(returnTemp)) {
+        alert('Informe valores válidos para vazão, carga sensível e temperatura de retorno.');
+        return;
+      }
+
+      const loadKW = sensibleLoadToKW(loadValue, unit);
+      const deltaT = loadKW / (0.000335 * airflow);
+      const supplyTemp = returnTemp - deltaT;
+
+      result.innerHTML = `<strong>Resultado:</strong><br>
+        Carga sensível: ${loadKW.toFixed(2)} kW<br>
+        Vazão de ar: ${airflow.toFixed(2)} m³/h<br>
+        Temperatura de retorno: ${returnTemp.toFixed(2)} °C<br>
+        ΔT necessário: ${deltaT.toFixed(2)} °C<br>
+        <strong>Temperatura de insuflamento: ${supplyTemp.toFixed(2)} °C</strong><br>
+        <span style="color:#6b7c8f;">Fórmula usada: Tins = Tretorno − Qs / (0,000335 × Vazão)</span>`;
+    }
+
+    function findTemperatureFromHW(hTarget, wTarget) {
+      return (hTarget - 2501 * wTarget) / (1.006 + 1.86 * wTarget);
+    }
+
+    function relativeHumidityFromTW(T, W, P) {
+      const pw = (W * P) / (0.62198 + W);
+      const pws = saturationPressure(T);
+      return (pw / pws) * 100;
+    }
+
+    function calculateAirMixing() {
+      const altitude = parseFloat(document.getElementById('mixAltitude').value) || 0;
+      const P = pressureFromAltitude(altitude);
+      const q1 = parseFloat(document.getElementById('airflow1').value);
+      const t1 = parseFloat(document.getElementById('temp1').value);
+      const rh1 = parseFloat(document.getElementById('rh1').value);
+      const q2 = parseFloat(document.getElementById('airflow2').value);
+      const t2 = parseFloat(document.getElementById('temp2').value);
+      const rh2 = parseFloat(document.getElementById('rh2').value);
+      const result = document.getElementById('mixingResult');
+
+      if ([q1, t1, rh1, q2, t2, rh2].some(v => isNaN(v)) || q1 <= 0 || q2 <= 0 || rh1 <= 0 || rh1 > 100 || rh2 <= 0 || rh2 > 100) {
+        alert('Informe vazões, temperaturas e umidades relativas válidas.');
+        return;
+      }
+
+      const w1 = humidityRatio(t1, rh1, P);
+      const h1 = enthalpy(t1, w1);
+      const v1 = (0.287042 * (t1 + 273.15) * (1 + 1.607858 * w1)) / P;
+      const m1 = (q1 / 3600) / v1;
+
+      const w2 = humidityRatio(t2, rh2, P);
+      const h2 = enthalpy(t2, w2);
+      const v2 = (0.287042 * (t2 + 273.15) * (1 + 1.607858 * w2)) / P;
+      const m2 = (q2 / 3600) / v2;
+
+      const wm = ((m1 * w1) + (m2 * w2)) / (m1 + m2);
+      const hm = ((m1 * h1) + (m2 * h2)) / (m1 + m2);
+      const tm = findTemperatureFromHW(hm, wm);
+      const rhm = relativeHumidityFromTW(tm, wm, P);
+      const dpm = dewPoint(tm, rhm);
+
+      result.innerHTML = `<strong>Resultado da mistura:</strong><br>
+        Pressão atmosférica: ${P.toFixed(2)} kPa<br>
+        Vazão mássica ar 1: ${m1.toFixed(3)} kg/s<br>
+        Vazão mássica ar 2: ${m2.toFixed(3)} kg/s<br>
+        Entalpia da mistura: ${hm.toFixed(2)} kJ/kg ar seco<br>
+        Razão de umidade da mistura: ${(wm * 1000).toFixed(2)} g/kg<br>
+        <strong>Temperatura da mistura: ${tm.toFixed(2)} °C</strong><br>
+        <strong>Umidade relativa da mistura: ${rhm.toFixed(2)} %</strong><br>
+        Ponto de orvalho da mistura: ${dpm.toFixed(2)} °C`;
+    }
+
+    function pressureFromAltitude(altitude) {
+      // Pressão atmosférica aproximada em kPa pela atmosfera padrão
+      return 101.325 * Math.pow(1 - 2.25577e-5 * altitude, 5.2559);
+    }
+
+    function saturationPressure(T) {
+      // Pressão de saturação da água em kPa - aproximação Tetens
+      return 0.61078 * Math.exp((17.2694 * T) / (T + 237.3));
+    }
+
+    function humidityRatio(T, RH, P) {
+      const pws = saturationPressure(T);
+      const pw = (RH / 100) * pws;
+      return 0.62198 * pw / (P - pw);
+    }
+
+    function enthalpy(T, W) {
+      // h em kJ/kg de ar seco
+      return 1.006 * T + W * (2501 + 1.86 * T);
+    }
+
+    function dewPoint(T, RH) {
+      const a = 17.27;
+      const b = 237.7;
+      const alpha = ((a * T) / (b + T)) + Math.log(RH / 100);
+      return (b * alpha) / (a - alpha);
+    }
+
+    function xFromT(T) {
+      return chart.left + ((T - chart.tMin) / (chart.tMax - chart.tMin)) * (chart.right - chart.left);
+    }
+
+    function yFromW(W) {
+      return chart.bottom - ((W - chart.wMin) / (chart.wMax - chart.wMin)) * (chart.bottom - chart.top);
+    }
+
+    function drawAxes() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#1f2933';
+      ctx.fillStyle = '#1f2933';
+      ctx.font = '13px Arial';
+
+      ctx.beginPath();
+      ctx.moveTo(chart.left, chart.top);
+      ctx.lineTo(chart.left, chart.bottom);
+      ctx.lineTo(chart.right, chart.bottom);
+      ctx.stroke();
+
+      // Eixo X - Temperatura
+      for (let T = chart.tMin; T <= chart.tMax; T += 5) {
+        const x = xFromT(T);
+        ctx.strokeStyle = '#e4eaf0';
+        ctx.beginPath();
+        ctx.moveTo(x, chart.top);
+        ctx.lineTo(x, chart.bottom);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#1f2933';
+        ctx.beginPath();
+        ctx.moveTo(x, chart.bottom);
+        ctx.lineTo(x, chart.bottom + 6);
+        ctx.stroke();
+        ctx.fillText(T + '°C', x - 13, chart.bottom + 22);
+      }
+
+      // Eixo Y - Razão de umidade
+      for (let W = 0; W <= chart.wMax; W += 0.005) {
+        const y = yFromW(W);
+        ctx.strokeStyle = '#e4eaf0';
+        ctx.beginPath();
+        ctx.moveTo(chart.left, y);
+        ctx.lineTo(chart.right, y);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#1f2933';
+        ctx.beginPath();
+        ctx.moveTo(chart.left - 6, y);
+        ctx.lineTo(chart.left, y);
+        ctx.stroke();
+        ctx.fillText((W * 1000).toFixed(0), chart.left - 45, y + 4);
+      }
+
+      ctx.font = '15px Arial';
+      ctx.fillText('Temperatura de bulbo seco - TBS (°C)', 365, 630);
+
+      // Legenda da zona de conforto
+      ctx.fillStyle = 'rgba(100, 181, 246, 0.7)';
+      ctx.fillRect(720, 605, 26, 14);
+
+      ctx.strokeStyle = 'rgba(30, 136, 229, 0.9)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(720, 605, 26, 14);
+
+      ctx.fillStyle = '#12324a';
+      ctx.font = '13px Arial';
+      ctx.fillText('Zona de conforto (20°C a 24°C | 50% a 60% UR)', 755, 617);
+
+      ctx.save();
+      ctx.translate(20, 360);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Razão de umidade W (g/kg de ar seco)', 0, 0);
+      ctx.restore();
+    }
+
+    function drawComfortZone(P) {
+      const comfortPoints = [
+        { T: 20, RH: 50 },
+        { T: 24, RH: 50 },
+        { T: 24, RH: 60 },
+        { T: 20, RH: 60 }
+      ];
+
+      const polygon = comfortPoints.map(p => {
+        const W = humidityRatio(p.T, p.RH, P);
+        return {
+          x: xFromT(p.T),
+          y: yFromW(W)
+        };
       });
-    });
 
-    function numero(id) {
-      const valor = parseFloat(document.getElementById(id).value.replace(',', '.'));
-      return isNaN(valor) ? 0 : valor;
+      ctx.beginPath();
+      ctx.moveTo(polygon[0].x, polygon[0].y);
+
+      for (let i = 1; i < polygon.length; i++) {
+        ctx.lineTo(polygon[i].x, polygon[i].y);
+      }
+
+      ctx.closePath();
+
+      ctx.fillStyle = 'rgba(100, 181, 246, 0.7)';
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(30, 136, 229, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Legenda removida do centro da carta para melhorar visualização
     }
 
-    function texto(id) {
-      return document.getElementById(id).value.trim();
-    }
+    function drawRHCurves(P) {
+      const rhValues = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
-    function moedaData(dataISO) {
-      if (!dataISO) return '';
-      const partes = dataISO.split('-');
-      return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : dataISO;
-    }
+      rhValues.forEach(rh => {
+        ctx.beginPath();
+        let started = false;
 
-    function formatarNumero(valor, casas = 2) {
-      return valor.toLocaleString('pt-BR', {
-        minimumFractionDigits: casas,
-        maximumFractionDigits: casas
+        for (let T = chart.tMin; T <= chart.tMax; T += 0.25) {
+          const W = humidityRatio(T, rh, P);
+          if (W < chart.wMin || W > chart.wMax) continue;
+
+          const x = xFromT(T);
+          const y = yFromW(W);
+
+          if (!started) {
+            ctx.moveTo(x, y);
+            started = true;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+
+        ctx.strokeStyle = rh === 100 ? '#0b75b7' : '#9fb3c8';
+        ctx.lineWidth = rh === 100 ? 2 : 1;
+        ctx.stroke();
+
+        // Rótulo das curvas
+        const labelT = 42;
+        const labelW = humidityRatio(labelT, rh, P);
+        if (labelW < chart.wMax) {
+          ctx.fillStyle = '#52606d';
+          ctx.font = '11px Arial';
+          ctx.fillText(rh + '%', xFromT(labelT) + 4, yFromW(labelW));
+        }
       });
     }
 
-    function formatarInteiro(valor) {
-      return Math.round(valor).toLocaleString('pt-BR');
+    function drawEnthalpyLines() {
+      ctx.strokeStyle = '#e0b16a';
+      ctx.lineWidth = 0.8;
+      ctx.font = '10px Arial';
+      ctx.fillStyle = '#9a6b20';
+
+      for (let h = 20; h <= 110; h += 10) {
+        ctx.beginPath();
+        let started = false;
+
+        for (let T = chart.tMin; T <= chart.tMax; T += 0.5) {
+          const W = (h - 1.006 * T) / (2501 + 1.86 * T);
+          if (W < chart.wMin || W > chart.wMax) continue;
+
+          const x = xFromT(T);
+          const y = yFromW(W);
+
+          if (!started) {
+            ctx.moveTo(x, y);
+            started = true;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+
+        ctx.stroke();
+      }
     }
 
-    function linhasParaLista(textoBruto) {
-      return textoBruto
-        .split('\n')
-        .map(l => l.trim())
-        .filter(Boolean)
-        .map(l => `<li>${l}</li>`)
-        .join('');
+    function drawProcess() {
+      if (points.length === 0) return;
+
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#d62828';
+      ctx.beginPath();
+
+      points.forEach((p, index) => {
+        const x = xFromT(p.T);
+        const y = yFromW(p.W);
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      points.forEach((p, index) => {
+        const x = xFromT(p.T);
+        const y = yFromW(p.W);
+
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#d62828';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#111827';
+        ctx.font = '13px Arial';
+        ctx.fillText(p.name || ('P' + (index + 1)), x + 8, y - 8);
+      });
     }
 
-    function calcular() {
-      const data = texto('data');
-      const responsavel = texto('responsavel') || '[Nome do engenheiro]';
-      const local = texto('local');
-      const norma = texto('norma');
+    function drawChart() {
+      const altitude = parseFloat(document.getElementById('altitude').value) || 0;
+      const P = pressureFromAltitude(altitude);
 
-      const areaCozinha = numero('areaCozinha');
-      const peDireito = numero('peDireito');
-      const horas = numero('horas');
-      const volumeManual = numero('volumeManual');
-      const volume = volumeManual > 0 ? volumeManual : areaCozinha * peDireito;
+      drawAxes();
+      drawComfortZone(P);
+      drawRHCurves(P);
+      drawEnthalpyLines();
+      drawProcess();
 
-      const tipoCoifa = texto('tipoCoifa');
-      const alturaCoifa = numero('alturaCoifa');
-      const larguraCoifa = numero('larguraCoifa');
-      const comprimentoCoifa = numero('comprimentoCoifa');
-      const areaCoifaManual = numero('areaCoifaManual');
-      const areaCoifa = areaCoifaManual > 0 ? areaCoifaManual : larguraCoifa * comprimentoCoifa;
-      const velocidade = numero('velocidade');
-
-      const reposicaoMinPct = numero('reposicaoMin');
-      const reposicaoMaxPct = numero('reposicaoMax');
-      const vazao = areaCoifa * velocidade * 3600;
-      const reposicaoMin = vazao * reposicaoMinPct / 100;
-      const reposicaoMax = vazao * reposicaoMaxPct / 100;
-
-      const valido = areaCozinha > 0 && peDireito > 0 && areaCoifa > 0 && velocidade > 0 && reposicaoMinPct > 0 && reposicaoMaxPct > 0;
-      document.getElementById('warning').style.display = valido ? 'none' : 'block';
-
-      document.getElementById('resVolume').textContent = `${formatarNumero(volume, 2)} m³`;
-      document.getElementById('resAreaCoifa').textContent = `${formatarNumero(areaCoifa, 2)} m²`;
-      document.getElementById('resVazao').textContent = `${formatarInteiro(vazao)} m³/h`;
-      document.getElementById('resReposicao').textContent = `${formatarInteiro(reposicaoMin)} a ${formatarInteiro(reposicaoMax)} m³/h`;
-
-      const equipamentosLista = linhasParaLista(texto('equipamentos'));
-      const consideracoesLista = linhasParaLista(texto('consideracoes'));
-
-      document.getElementById('relatorio').innerHTML = `
-        <h1>Memorial de Cálculo da Vazão de Exaustão para Cozinha Profissional</h1>
-
-        <p><strong>Data:</strong> ${moedaData(data)}</p>
-        <p><strong>Assunto:</strong> Cálculo da vazão de exaustão para cozinha profissional</p>
-        <p><strong>Responsável Técnico:</strong> ${responsavel}</p>
-        <p><strong>Norma Base:</strong> ${norma}</p>
-        <p><strong>Local:</strong> ${local}</p>
-
-        <h3>1. Informações da Cozinha</h3>
-        <p><strong>Área útil:</strong> ${formatarNumero(areaCozinha, 2)} m²</p>
-        <p><strong>Pé-direito:</strong> ${formatarNumero(peDireito, 2)} m</p>
-        <p><strong>Volume total:</strong> ${formatarNumero(volume, 2)} m³</p>
-        <p><strong>Tempo de funcionamento diário:</strong> ${formatarNumero(horas, 1)} horas</p>
-
-        <h3>2. Equipamentos de Cocção</h3>
-        <ul>${equipamentosLista}</ul>
-
-        <h3>3. Características da Coifa</h3>
-        <p><strong>Tipo:</strong> ${tipoCoifa}</p>
-        <p><strong>Dimensões reais:</strong> ${formatarNumero(larguraCoifa, 2)} m × ${formatarNumero(comprimentoCoifa, 2)} m</p>
-        <p><strong>Área útil da coifa:</strong> ${formatarNumero(areaCoifa, 2)} m²</p>
-        <p><strong>Altura da coifa em relação à superfície de cocção:</strong> ${formatarNumero(alturaCoifa, 2)} m</p>
-
-        <h3>4. Critérios de Cálculo</h3>
-        <p>Para coifas sobre equipamentos geradores de calor e gordura, foi adotada velocidade de captação de <strong>${formatarNumero(velocidade, 2)} m/s</strong>.</p>
-
-        <h3>5. Cálculo da Vazão de Exaustão</h3>
-        <div class="formula">
-          Q = A<sub>coifa</sub> × V<sub>captação</sub> × 3600<br>
-          Q = ${formatarNumero(areaCoifa, 2)} m² × ${formatarNumero(velocidade, 2)} m/s × 3600 s/h<br>
-          Q = ${formatarInteiro(vazao)} m³/h
-        </div>
-
-        <h3>6. Ar de Reposição Recomendado</h3>
-        <p>Considerando reposição entre <strong>${formatarNumero(reposicaoMinPct, 0)}%</strong> e <strong>${formatarNumero(reposicaoMaxPct, 0)}%</strong> da vazão extraída:</p>
-        <p><strong>Reposição recomendada:</strong> ${formatarInteiro(reposicaoMin)} m³/h a ${formatarInteiro(reposicaoMax)} m³/h</p>
-
-        <h3>7. Considerações Finais</h3>
-        <ul>${consideracoesLista}</ul>
-
-        <div class="signature">
-          <div class="line"></div>
-          <p><strong>${responsavel}</strong></p>
-          <p>Responsável Técnico</p>
-        </div>
-      `;
+      ctx.fillStyle = '#12324a';
+      ctx.font = '14px Arial';
+      ctx.fillText('Pressão atmosférica aproximada: ' + P.toFixed(2) + ' kPa', 690, 30);
     }
 
-    document.addEventListener('DOMContentLoaded', calcular);
+    function togglePreviousW() {
+      const checked = document.getElementById('usePreviousW').checked;
+      const rhInput = document.getElementById('rh');
+
+      rhInput.disabled = checked;
+      rhInput.style.background = checked ? '#e9eef3' : '#ffffff';
+      rhInput.style.cursor = checked ? 'not-allowed' : 'text';
+    }
+
+    function addPoint() {
+      const altitude = parseFloat(document.getElementById('altitude').value) || 0;
+      const T = parseFloat(document.getElementById('temp').value);
+      let RH = parseFloat(document.getElementById('rh').value);
+      const usePreviousW = document.getElementById('usePreviousW').checked;
+      const name = document.getElementById('pointName').value || 'Ponto';
+      const P = pressureFromAltitude(altitude);
+
+      if (isNaN(T)) {
+        alert('Informe uma temperatura válida.');
+        return;
+      }
+
+      let W;
+
+      if (usePreviousW) {
+        if (points.length === 0) {
+          alert('Para usar a umidade absoluta do ponto anterior, adicione primeiro um ponto base.');
+          return;
+        }
+
+        W = points[points.length - 1].W;
+        RH = relativeHumidityFromTW(T, W, P);
+
+        if (RH <= 0 || RH > 100) {
+          alert('Com o W do ponto anterior, essa temperatura resulta em UR fora da faixa de 0% a 100%. Ajuste a temperatura.');
+          return;
+        }
+
+        document.getElementById('rh').value = RH.toFixed(2);
+      } else {
+        if (isNaN(RH) || RH <= 0 || RH > 100) {
+          alert('Informe uma umidade relativa válida.');
+          return;
+        }
+
+        W = humidityRatio(T, RH, P);
+      }
+      const h = enthalpy(T, W);
+      const dp = dewPoint(T, RH);
+
+      if (W > chart.wMax) {
+        alert('Este ponto está fora da escala vertical atual da carta.');
+        return;
+      }
+
+      points.push({ name, T, RH, W, h, dp });
+      updatePointList();
+      updateResults();
+      drawChart();
+
+      document.getElementById('pointName').value = 'Ponto ' + (points.length + 1);
+    }
+
+    function updatePointList() {
+      const list = document.getElementById('pointList');
+      list.innerHTML = '';
+
+      points.forEach((p, i) => {
+        const div = document.createElement('div');
+        div.className = 'point-item';
+        div.innerHTML = `<strong>${i + 1}. ${p.name}</strong><br>
+          TBS: ${p.T.toFixed(1)} °C | UR: ${p.RH.toFixed(1)}%<br>
+          W: ${(p.W * 1000).toFixed(2)} g/kg | h: ${p.h.toFixed(2)} kJ/kg`;
+        list.appendChild(div);
+      });
+
+      updatePointSelectors();
+    }
+
+    function printChartPDF() {
+      drawChart();
+
+      const imageData = canvas.toDataURL('image/png');
+      const altitude = parseFloat(document.getElementById('altitude').value) || 0;
+      const P = pressureFromAltitude(altitude);
+      const loadHTML = document.getElementById('loadResults').innerHTML;
+
+      let pointRows = '';
+      points.forEach((p, i) => {
+        pointRows += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${p.name}</td>
+            <td>${p.T.toFixed(2)}</td>
+            <td>${p.RH.toFixed(2)}</td>
+            <td>${(p.W * 1000).toFixed(2)}</td>
+            <td>${p.h.toFixed(2)}</td>
+            <td>${p.dp.toFixed(2)}</td>
+          </tr>`;
+      });
+
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>Carta Psicrométrica em PDF</title>
+          <style>
+            body {
+              font-family: Arial, Helvetica, sans-serif;
+              padding: 24px;
+              color: #1f2933;
+            }
+            h1 {
+              color: #12324a;
+              margin-bottom: 4px;
+            }
+            .info {
+              margin-bottom: 16px;
+              font-size: 14px;
+            }
+            img {
+              width: 100%;
+              max-width: 1000px;
+              border: 1px solid #d9e2ec;
+              border-radius: 8px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 18px;
+              font-size: 12px;
+            }
+            th, td {
+              border: 1px solid #cbd5df;
+              padding: 6px;
+              text-align: center;
+            }
+            th {
+              background: #eef6fb;
+            }
+            .box {
+              margin-top: 18px;
+              padding: 12px;
+              border: 1px solid #d9e2ec;
+              border-radius: 8px;
+              background: #f7fbff;
+              font-size: 13px;
+              line-height: 1.5;
+            }
+            @media print {
+              button { display: none; }
+              body { padding: 10mm; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Carta Psicrométrica</h1>
+          <div class="info">
+            Altitude: ${altitude.toFixed(0)} m<br>
+            Pressão atmosférica aproximada: ${P.toFixed(2)} kPa
+          </div>
+
+          <img src="${imageData}" alt="Carta Psicrométrica">
+
+          <h2>Pontos do processo</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Nº</th>
+                <th>Ponto</th>
+                <th>TBS (°C)</th>
+                <th>UR (%)</th>
+                <th>W (g/kg)</th>
+                <th>h (kJ/kg)</th>
+                <th>Orvalho (°C)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pointRows || '<tr><td colspan="7">Nenhum ponto adicionado.</td></tr>'}
+            </tbody>
+          </table>
+
+          <div class="box">
+            <strong>Cálculo de carga térmica:</strong><br>
+            ${loadHTML}
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          <\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    function updatePointSelectors() {
+      const pointA = document.getElementById('pointA');
+      const pointB = document.getElementById('pointB');
+
+      if (!pointA || !pointB) return;
+
+      const selectedA = pointA.value;
+      const selectedB = pointB.value;
+
+      pointA.innerHTML = '';
+      pointB.innerHTML = '';
+
+      points.forEach((p, i) => {
+        const optionA = document.createElement('option');
+        optionA.value = i;
+        optionA.textContent = `${i + 1} - ${p.name}`;
+        pointA.appendChild(optionA);
+
+        const optionB = document.createElement('option');
+        optionB.value = i;
+        optionB.textContent = `${i + 1} - ${p.name}`;
+        pointB.appendChild(optionB);
+      });
+
+      if (points.length >= 2) {
+        pointA.value = selectedA && selectedA < points.length ? selectedA : 0;
+        pointB.value = selectedB && selectedB < points.length ? selectedB : points.length - 1;
+      }
+    }
+
+    function calculateLoadTR() {
+      const loadResults = document.getElementById('loadResults');
+      const airflow = parseFloat(document.getElementById('airflow').value);
+      const indexA = parseInt(document.getElementById('pointA').value);
+      const indexB = parseInt(document.getElementById('pointB').value);
+
+      if (points.length < 2) {
+        loadResults.innerHTML = 'Adicione pelo menos dois pontos para calcular a carga térmica.';
+        return;
+      }
+
+      if (isNaN(airflow) || airflow <= 0) {
+        alert('Informe uma vazão de ar válida em m³/h.');
+        return;
+      }
+
+      if (isNaN(indexA) || isNaN(indexB) || indexA === indexB) {
+        alert('Escolha dois pontos diferentes.');
+        return;
+      }
+
+      const a = points[indexA];
+      const b = points[indexB];
+      const altitude = parseFloat(document.getElementById('altitude').value) || 0;
+      const P = pressureFromAltitude(altitude);
+
+      // Volume específico aproximado no ponto inicial, em m³/kg de ar seco
+      const specificVolume = (0.287042 * (a.T + 273.15) * (1 + 1.607858 * a.W)) / P;
+
+      // Vazão mássica de ar seco em kg/s
+      const massFlow = (airflow / 3600) / specificVolume;
+
+      const deltaH = b.h - a.h;
+      const loadKW = massFlow * deltaH;
+      const loadTR = loadKW / 3.5168525;
+
+      const loadType = loadKW >= 0 ? 'aquecimento/ganho de calor' : 'resfriamento/remoção de calor';
+
+      loadResults.innerHTML = `<strong>Carga térmica entre pontos:</strong><br>
+        Ponto inicial: ${a.name}<br>
+        Ponto final: ${b.name}<br>
+        Vazão de ar: ${airflow.toFixed(2)} m³/h<br>
+        Volume específico adotado: ${specificVolume.toFixed(3)} m³/kg ar seco<br>
+        Vazão mássica: ${massFlow.toFixed(3)} kg/s<br>
+        Δh: ${deltaH.toFixed(2)} kJ/kg ar seco<br>
+        Carga: ${loadKW.toFixed(2)} kW<br>
+        Carga: ${loadTR.toFixed(2)} TR<br>
+        Processo: ${loadType}`;
+    }
+
+    function updateResults() {
+      const results = document.getElementById('results');
+      if (points.length === 0) {
+        results.innerHTML = 'Nenhum ponto adicionado ainda.';
+        return;
+      }
+
+      const last = points[points.length - 1];
+      let html = `<strong>Último ponto calculado:</strong><br>
+        ${last.name}<br>
+        Temperatura: ${last.T.toFixed(2)} °C<br>
+        Umidade relativa: ${last.RH.toFixed(2)} %<br>
+        Razão de umidade: ${(last.W * 1000).toFixed(2)} g/kg<br>
+        Entalpia: ${last.h.toFixed(2)} kJ/kg ar seco<br>
+        Ponto de orvalho: ${last.dp.toFixed(2)} °C`;
+
+      if (points.length >= 2) {
+        const a = points[points.length - 2];
+        const b = points[points.length - 1];
+        html += `<hr style="margin:10px 0;border:0;border-top:1px solid #d9e2ec;">
+          <strong>Variação no último processo:</strong><br>
+          ΔT: ${(b.T - a.T).toFixed(2)} °C<br>
+          ΔW: ${((b.W - a.W) * 1000).toFixed(2)} g/kg<br>
+          Δh: ${(b.h - a.h).toFixed(2)} kJ/kg ar seco`;
+      }
+
+      results.innerHTML = html;
+    }
+
+    function removeLastPoint() {
+      if (points.length === 0) {
+        alert('Não existem pontos para remover.');
+        return;
+      }
+
+      points.pop();
+      updatePointList();
+      updateResults();
+      drawChart();
+
+      document.getElementById('pointName').value = 'Ponto ' + (points.length + 1);
+    }
+
+    function clearPoints() {
+      points = [];
+      updatePointList();
+      updateResults();
+      drawChart();
+      document.getElementById('pointName').value = 'Ponto 1';
+    }
+
+    drawChart();
   </script>
+
+<script>
+(function(){
+  var current=(location.pathname.split('/').pop()||'home.html');
+  if(current==='home(1).html') current='home.html';
+  var links=document.querySelectorAll('.nav-links a');
+  for(var i=0;i<links.length;i++){
+    if(links[i].getAttribute('data-page')===current){links[i].classList.add('active');}
+  }
+})();
+</script>
+
 </body>
 </html>

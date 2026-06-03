@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Seleção de Grelhas</title>
+<style>
+:root{
+  --bg:#f4f7fb;--card:#fff;--primary:#0f4fbf;--dark:#0b2d75;--text:#172033;--muted:#607086;--border:#d8dee9;
+  --ok:#15803d;--bad:#b91c1c;--warn:#b45309;--soft:#eef3ff;--sel:#dcfce7;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,var(--primary),var(--dark));color:white;padding:24px 18px}
+header h1{margin:0 0 6px;font-size:28px}header p{margin:0;opacity:.92}
+main{max-width:1220px;margin:22px auto;padding:0 16px 36px}
+.grid{display:grid;grid-template-columns:350px 1fr;gap:16px;align-items:start}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 8px 22px rgba(15,23,42,.06);margin-bottom:14px}
+h2{margin:0 0 14px;color:#0b2d75}h3{margin:12px 0 8px;color:#0b2d75}
+label{display:block;font-weight:700;margin:12px 0 5px}
+input,select{width:100%;padding:10px 11px;border:1px solid var(--border);border-radius:10px;font-size:15px;background:white}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}
+button{width:100%;margin-top:14px;padding:12px;border:0;border-radius:12px;background:var(--primary);color:white;font-weight:700;font-size:15px;cursor:pointer}
+button:hover{filter:brightness(.95)}button.secondary{background:#0f766e}button.gray{background:#475569}button.small{width:auto;margin:0;padding:7px 10px;border-radius:9px;font-size:12px}
+.size-options{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.size-btn{width:auto;margin:0;padding:6px 9px;border-radius:999px;font-size:12px;background:#e2e8f0;color:#0f172a;border:1px solid #cbd5e1}.size-btn:hover{background:#cbd5e1}.size-btn.active{background:#16a34a;color:white;border-color:#15803d}.size-btn:disabled{opacity:.45;cursor:not-allowed}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.kpi{border:1px solid var(--border);background:#f8fafc;border-radius:14px;padding:12px}
+.kpi span{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}.kpi strong{font-size:20px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{border-bottom:1px solid var(--border);padding:8px 6px;text-align:center;vertical-align:middle}
+th{background:var(--soft);color:#0b2d75;font-size:12px;position:sticky;top:0;z-index:1}
+tr.selected{background:var(--sel)!important;outline:2px solid #86efac}tr.okrow{background:#fbfffd}tr.badrow{opacity:.55}
+.badge{display:inline-block;border-radius:999px;padding:4px 8px;font-weight:700;font-size:12px;white-space:nowrap}.badge.ok{background:#dcfce7;color:var(--ok)}.badge.bad{background:#fee2e2;color:var(--bad)}.badge.warn{background:#fef3c7;color:var(--warn)}
+.best{border:1px solid #86efac;background:#f0fdf4;border-radius:14px;padding:12px;margin-bottom:12px;line-height:1.45}
+.note{font-size:12px;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;padding:10px;border-radius:12px;margin-top:10px;line-height:1.35}
+.table-wrap{max-height:620px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}.tools button{width:auto;margin:0;padding:9px 12px}
+#status{font-weight:700;color:#0b2d75}
+.report-box{border:1px solid #cbd5e1;background:linear-gradient(180deg,#ffffff,#f8fafc);border-radius:16px;padding:16px;margin-top:12px}
+.report-box h3{margin:0 0 12px;color:#0b2d75}
+.report-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.report-item{border:1px solid var(--border);background:#ffffff;border-radius:12px;padding:10px}
+.report-item span{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.report-item strong{font-size:16px;color:#0f172a}
+.report-item.full{grid-column:1/-1}
+.report-status{display:inline-block;border-radius:999px;padding:5px 10px;font-weight:800;font-size:12px}
+.report-status.ok{background:#dcfce7;color:var(--ok)}
+.report-status.bad{background:#fee2e2;color:var(--bad)}
+@media(max-width:980px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+@media print{
+  @page{size:A4 portrait;margin:12mm}
+
+  html,body{
+    width:auto;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    background:#ffffff!important;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+
+  body *{visibility:hidden!important}
+
+  .app-nav,
+  header,
+  .inputs,
+  .resultado-area > .card:not(#area-impressao),
+  .tools,
+  button{
+    display:none!important;
+  }
+
+  main,
+  .grid,
+  .resultado-area{
+    display:block!important;
+    max-width:none!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  #area-impressao,
+  #area-impressao *{
+    visibility:visible!important;
+  }
+
+  #area-impressao{
+    position:static!important;
+    display:block!important;
+    width:100%!important;
+    margin:0!important;
+    padding:14px!important;
+    box-shadow:none!important;
+    border:1px solid #999!important;
+    border-radius:10px!important;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  .kpis{grid-template-columns:repeat(2,1fr)!important}
+  .kpi{padding:10px!important}
+  .kpi strong{font-size:16px!important}
+
+  .best{display:none!important}
+  .report-box{border:1px solid #999!important;background:#fff!important;margin-top:10px!important}
+  .report-grid{grid-template-columns:repeat(2,1fr)!important}
+  .report-item{padding:9px!important}
+  .report-item strong{font-size:14px!important}
+
+  input{
+    border:0!important;
+    background:transparent!important;
+    font-weight:700!important;
+    padding-left:0!important;
+  }
+}
+
+
+
+/* ===== Menu e padronização visual entre páginas ===== */
+:root{--nav-primary:#0f4fbf;--nav-dark:#0b2d75;--nav-bg:#f4f7fb;--nav-card:#ffffff;--nav-text:#172033;--nav-muted:#607086;--nav-border:#d8dee9;}
+.app-nav{position:sticky;top:0;z-index:999;background:linear-gradient(135deg,var(--nav-primary),var(--nav-dark));color:#fff;box-shadow:0 8px 24px rgba(15,23,42,.16);}
+.app-nav-inner{max-width:1300px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+.app-nav .brand{color:#fff;text-decoration:none;font-weight:800;letter-spacing:.2px;font-size:18px;white-space:nowrap;}
+.nav-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.nav-links a{color:#eaf1ff;text-decoration:none;font-weight:700;font-size:13px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);}
+.nav-links a:hover,.nav-links a.active{background:#fff;color:var(--nav-dark);}
+.card,.panel,.chart-card,.tool-card{border:1px solid var(--nav-border);box-shadow:0 8px 22px rgba(15,23,42,.06);}
+@media(max-width:760px){.app-nav-inner{align-items:flex-start;flex-direction:column}.nav-links{justify-content:flex-start}.nav-links a{font-size:12px;padding:7px 9px}}
+@media print{.app-nav{display:none!important}}
+</style>
+</head>
+<body>
+
+<nav class="app-nav">
+  <div class="app-nav-inner">
+    <a class="brand" href="home.html">Seletores AVAC</a>
+    <div class="nav-links">
+      <a href="index.html" data-page="index.html">Home</a>
+      <a href="Difusor_Quadrado.html" data-page="Difusor_Quadrado.html">Difusor Quadrado</a>
+      <a href="Grelhas.html" data-page="Grelhas.html">Grelhas</a>
+      <a href="Sala_de_Cirurgia.html" data-page="Sala_de_Cirurgia.html">Sala de Cirurgia</a>
+      <a href="Arquitetura.html" data-page="Arquitetura.html">Arquitetura</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <h1>Seleção de Grelhas</h1>
+  <p>Selecionar grelhas por vazão, perda de carga, quantidade e nível de ruído.</p>
+</header>
+<main>
+<div class="grid">
+  <section class="inputs card">
+    <h2>Dados de Entrada</h2>
+    <label>Identificação</label><input id="identificacaoEntrada" value="Ambiente 01">
+    <label>Vazão total do sistema (m³/h)</label><input id="vazao" type="number" value="900" step="10">
+    <div class="row">
+      <div><label>Nº de grelhas</label><input id="qtd" type="number" value="3" step="1" min="1"></div>
+      <div><label>∆P (mmca) </label><input id="dpmax" type="number" value="35" step="0.1"></div>
+    </div>
+    <div class="hint">A vazão de seleção será calculada como: vazão total ÷ número de grelhas.</div>
+    <label>Nível de ruído máximo dB(A)</label><input id="dbmax" type="number" value="40" step="1">
+    <label>Mostrar na tabela</label>
+    <select id="filtro">
+      <option value="aprovadas">Somente opções que atendem</option>
+      <option value="todas">Todas as opções da base</option>
+    </select>
+    <button onclick="calcular()">Calcular seleção</button>
+    <button class="secondary" onclick="imprimirPDF()">Imprimir / Salvar PDF</button>
+    <button class="gray" onclick="limparSelecao()">Limpar seleção manual</button>
+    <div class="note">Critério: a opção atende quando a vazão da tabela é igual ou superior à vazão por grelha, a perda de carga é menor ou igual ao limite informado e o ruído é menor ou igual ao limite informado.</div>
+  </section>
+
+  <section class="resultado-area">
+    <div class="card" id="area-impressao">
+      <h2>Resultado</h2>
+      <label>Identificação</label><input id="identificacaoPreview" value="Ambiente 01" readonly>
+      <div class="kpis">
+        <div class="kpi"><span>Vazão total</span><strong id="kVazao">-</strong></div>
+        <div class="kpi"><span>Vazão por grelha</span><strong id="kPorGrelha">-</strong></div>
+        <div class="kpi"><span>∆p máximo</span><strong id="kDp">-</strong></div>
+        <div class="kpi"><span>Ruído máximo</span><strong id="kDb">-</strong></div>
+      </div>
+
+      <div class="report-box" id="previewRelatorio">
+        <h3>Relatório de Seleção da Grelha</h3>
+        <div class="report-grid">
+          <div class="report-item full"><span>Identificação</span><strong id="impIdentificacao">Ambiente 01</strong></div>
+          <div class="report-item"><span>Tamanho selecionado</span><strong id="impTamanho">-</strong></div>
+          <div class="report-item"><span>Status</span><strong id="impStatus">-</strong></div>
+          <div class="report-item"><span>Vazão total</span><strong id="impVazaoTotal">-</strong></div>
+          <div class="report-item"><span>Vazão por grelha</span><strong id="impVazaoGrelha">-</strong></div>
+          <div class="report-item"><span>Vazão de tabela</span><strong id="impVazaoTabela">-</strong></div>
+          <div class="report-item"><span>Perda de carga da grelha</span><strong id="impDp">-</strong></div>
+          <div class="report-item"><span>Ruído da grelha</span><strong id="impDb">-</strong></div>
+          <div class="report-item"><span>Limites informados</span><strong id="impLimites">-</strong></div>
+          <div class="report-item full"><span>Opções disponíveis na mesma linha</span><strong id="impOpcoes">-</strong></div>
+        </div>
+      </div>
+
+      <div class="best" id="resumo">Preencha os dados e clique em calcular.</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h2>Opções de grelha</h2><span id="status"></span></div>
+      <div class="tools">
+        <button onclick="ordenar('proxima')">Ordenar por vazão mais próxima</button>
+        <button onclick="ordenar('menorDp')">Menor ∆p</button>
+        <button onclick="ordenar('menorDb')">Menor ruído</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Selecionada</th><th>Vazão tabela<br>(m³/h)</th><th>∆p<br>(mmCA)</th><th>Ruído<br>dB(A)</th><th>Escolher modelo</th><th>Vazão?</th><th>∆p?</th><th>Ruído?</th><th>Status</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+</main>
+<script>
+const GRELHAS=[{"q":100,"dp":0.7,"db":32,"sizes":["75x225"]},{"q":100,"dp":0.3,"db":10,"sizes":["75x325"]},{"q":100,"dp":0.22,"db":8,"sizes":["75x425","125x225"]},{"q":100,"dp":0.15,"db":5,"sizes":["75x525","165x225"]},{"q":100,"dp":0.12,"db":5,"sizes":["75x625","125x325"]},{"q":150,"dp":1.7,"db":42,"sizes":["75x225"]},{"q":150,"dp":0.7,"db":20,"sizes":["75x325"]},{"q":150,"dp":0.5,"db":18,"sizes":["75x425","125x225"]},{"q":150,"dp":0.3,"db":12,"sizes":["75x525","165x225"]},{"q":150,"dp":0.25,"db":11,"sizes":["75x625","125x325"]},{"q":150,"dp":0.14,"db":4,"sizes":["75x825","125x425","165x325","225x255"]},{"q":200,"dp":3,"db":50,"sizes":["75x225"]},{"q":200,"dp":1.4,"db":27,"sizes":["75x325"]},{"q":200,"dp":0.9,"db":24,"sizes":["75x425","125x225"]},{"q":200,"dp":0.55,"db":20,"sizes":["75x525","165x225"]},{"q":200,"dp":0.4,"db":17,"sizes":["75x625","125x325"]},{"q":200,"dp":0.2,"db":11,"sizes":["75x825","125x425","165x325","225x255"]},{"q":200,"dp":0.14,"db":5,"sizes":["75x1025","125x525","165x425"]},{"q":250,"dp":1.9,"db":32,"sizes":["75x325"]},{"q":250,"dp":1.4,"db":30,"sizes":["75x425","125x225"]},{"q":250,"dp":0.9,"db":25,"sizes":["75x525","165x225"]},{"q":250,"dp":0.6,"db":22,"sizes":["75x625","125x325"]},{"q":250,"dp":0.2,"db":15,"sizes":["75x825","125x425","165x325","225x255"]},{"q":250,"dp":0.2,"db":12,"sizes":["75x1025","125x525","165x425"]},{"q":250,"dp":0.14,"db":6,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":300,"dp":2.5,"db":37,"sizes":["75x425","125x225"]},{"q":300,"dp":1.4,"db":30,"sizes":["75x525","165x225"]},{"q":300,"dp":0.95,"db":27,"sizes":["75x625","125x325"]},{"q":300,"dp":0.5,"db":21,"sizes":["75x825","125x425","165x325","225x255"]},{"q":300,"dp":0.3,"db":15,"sizes":["75x1025","125x525","165x425"]},{"q":300,"dp":0.22,"db":12,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":300,"dp":0.14,"db":7,"sizes":["125x825","165x625","225x425"]},{"q":350,"dp":1.6,"db":33,"sizes":["75x525","165x225"]},{"q":350,"dp":1.4,"db":31,"sizes":["75x625","125x325"]},{"q":350,"dp":0.55,"db":24,"sizes":["75x825","125x425","165x325","225x255"]},{"q":350,"dp":0.4,"db":19,"sizes":["75x1025","125x525","165x425"]},{"q":350,"dp":0.29,"db":15,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":350,"dp":0.15,"db":9,"sizes":["125x825","165x625","225x425"]},{"q":350,"dp":0.11,"db":3,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":400,"dp":2,"db":36,"sizes":["75x525","165x225"]},{"q":400,"dp":1.6,"db":34,"sizes":["75x625","125x325"]},{"q":400,"dp":0.9,"db":27,"sizes":["75x825","125x425","165x325","225x255"]},{"q":400,"dp":0.56,"db":23,"sizes":["75x1025","125x525","165x425"]},{"q":400,"dp":0.4,"db":20,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":400,"dp":0.22,"db":14,"sizes":["125x825","165x625","225x425"]},{"q":400,"dp":0.14,"db":8,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":450,"dp":2,"db":37,"sizes":["75x625","125x325"]},{"q":450,"dp":1,"db":29,"sizes":["75x825","125x425","165x325","225x255"]},{"q":450,"dp":0.7,"db":25,"sizes":["75x1025","125x525","165x425"]},{"q":450,"dp":0.5,"db":23,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":450,"dp":0.27,"db":16,"sizes":["125x825","165x625","225x425"]},{"q":450,"dp":0.15,"db":10,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":500,"dp":1.4,"db":33,"sizes":["75x825","125x425","165x325","225x255"]},{"q":500,"dp":0.85,"db":28,"sizes":["75x1025","125x525","165x425"]},{"q":500,"dp":0.6,"db":24,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":500,"dp":0.35,"db":18,"sizes":["125x825","165x625","225x425"]},{"q":500,"dp":0.22,"db":15,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":500,"dp":0.14,"db":9,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":600,"dp":1.9,"db":37,"sizes":["75x825","125x425","165x325","225x255"]},{"q":600,"dp":1.4,"db":33,"sizes":["75x1025","125x525","165x425"]},{"q":600,"dp":0.85,"db":29,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":600,"dp":0.5,"db":23,"sizes":["125x825","165x625","225x425"]},{"q":600,"dp":0.3,"db":18,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":600,"dp":0.2,"db":16,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":700,"dp":1.7,"db":36,"sizes":["75x1025","125x525","165x425"]},{"q":700,"dp":1.2,"db":33,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":700,"dp":0.62,"db":26,"sizes":["125x825","165x625","225x425"]},{"q":700,"dp":0.4,"db":22,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":700,"dp":0.27,"db":18,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":700,"dp":0.15,"db":13,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":800,"dp":2.3,"db":40,"sizes":["75x1025","125x525","165x425"]},{"q":800,"dp":1.5,"db":36,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":800,"dp":0.85,"db":30,"sizes":["125x825","165x625","225x425"]},{"q":800,"dp":0.55,"db":26,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":800,"dp":0.4,"db":23,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":800,"dp":0.22,"db":17,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":800,"dp":0.14,"db":11,"sizes":["225x1025","325x625","425x525"]},{"q":900,"dp":1.9,"db":39,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":900,"dp":1.1,"db":32,"sizes":["125x825","165x625","225x425"]},{"q":900,"dp":0.7,"db":28,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":900,"dp":0.5,"db":26,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":900,"dp":0.27,"db":20,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":900,"dp":0.15,"db":13,"sizes":["225x1025","325x625","425x525"]},{"q":900,"dp":0.14,"db":12,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1000,"dp":2.5,"db":42,"sizes":["75x1225","125x625","165x525","225x325"]},{"q":1000,"dp":1.4,"db":36,"sizes":["125x825","165x625","225x425"]},{"q":1000,"dp":0.85,"db":31,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":1000,"dp":0.6,"db":27,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":1000,"dp":0.33,"db":22,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":1000,"dp":0.22,"db":17,"sizes":["225x1025","325x625","425x525"]},{"q":1000,"dp":0.15,"db":14,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1100,"dp":1.6,"db":38,"sizes":["125x825","165x625","225x425"]},{"q":1100,"dp":1.1,"db":33,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":1100,"dp":0.7,"db":30,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":1100,"dp":0.4,"db":25,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":1100,"dp":0.25,"db":18,"sizes":["225x1025","325x625","425x525"]},{"q":1100,"dp":0.17,"db":16,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1200,"dp":1.9,"db":40,"sizes":["125x825","165x625","225x425"]},{"q":1200,"dp":1.4,"db":36,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":1200,"dp":0.85,"db":32,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":1200,"dp":0.45,"db":25,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":1200,"dp":0.3,"db":21,"sizes":["225x1025","325x625","425x525"]},{"q":1200,"dp":0.22,"db":17,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1300,"dp":1.4,"db":37,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":1300,"dp":0.9,"db":33,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":1300,"dp":0.56,"db":28,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":1300,"dp":0.38,"db":24,"sizes":["225x1025","325x625","425x525"]},{"q":1300,"dp":0.25,"db":19,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1400,"dp":1.6,"db":40,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":1400,"dp":1.3,"db":36,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":1400,"dp":0.6,"db":28,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":1400,"dp":0.4,"db":25,"sizes":["225x1025","325x625","425x525"]},{"q":1400,"dp":0.28,"db":20,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1500,"dp":1.9,"db":41,"sizes":["125x1025","165x825","225x525","325x325"]},{"q":1500,"dp":1.4,"db":38,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":1500,"dp":0.7,"db":30,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":1500,"dp":0.5,"db":27,"sizes":["225x1025","325x625","425x525"]},{"q":1500,"dp":0.34,"db":22,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1500,"dp":0.22,"db":19,"sizes":["325X1025","425X825","525X625"]},{"q":1600,"dp":1.5,"db":39,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":1600,"dp":0.8,"db":33,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":1600,"dp":0.55,"db":29,"sizes":["225x1025","325x625","425x525"]},{"q":1600,"dp":0.38,"db":24,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1600,"dp":0.25,"db":20,"sizes":["325X1025","425X825","525X625"]},{"q":1700,"dp":1.8,"db":42,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":1700,"dp":0.9,"db":34,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":1700,"dp":0.6,"db":30,"sizes":["225x1025","325x625","425x525"]},{"q":1700,"dp":0.4,"db":25,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1700,"dp":0.27,"db":22,"sizes":["325X1025","425X825","525X625"]},{"q":1700,"dp":0.2,"db":19,"sizes":["325X1225"]},{"q":1800,"dp":2,"db":42,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":1800,"dp":1,"db":35,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":1800,"dp":0.7,"db":31,"sizes":["225x1025","325x625","425x525"]},{"q":1800,"dp":0.46,"db":26,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1800,"dp":0.28,"db":22,"sizes":["325X1025","425X825","525X625"]},{"q":1800,"dp":0.22,"db":20,"sizes":["325X1225"]},{"q":1800,"dp":0.15,"db":17,"sizes":["425X1025","525X825"]},{"q":1900,"dp":2.3,"db":44,"sizes":["125x1225","165x1025","225x625","325x425"]},{"q":1900,"dp":1.3,"db":37,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":1900,"dp":0.8,"db":34,"sizes":["225x1025","325x625","425x525"]},{"q":1900,"dp":0.52,"db":28,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":1900,"dp":0.31,"db":24,"sizes":["325X1025","425X825","525X625"]},{"q":1900,"dp":0.24,"db":22,"sizes":["325X1225"]},{"q":1900,"dp":0.2,"db":19,"sizes":["425X1025","525X825"]},{"q":2000,"dp":1.4,"db":38,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":2000,"dp":0.85,"db":34,"sizes":["225x1025","325x625","425x525"]},{"q":2000,"dp":0.57,"db":29,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":2000,"dp":0.38,"db":26,"sizes":["325X1025","425X825","525X625"]},{"q":2000,"dp":0.27,"db":23,"sizes":["325X1225"]},{"q":2000,"dp":0.22,"db":22,"sizes":["425X1025","525X825"]},{"q":2100,"dp":1.4,"db":39,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":2100,"dp":0.9,"db":35,"sizes":["225x1025","325x625","425x525"]},{"q":2100,"dp":0.62,"db":30,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":2100,"dp":0.4,"db":26,"sizes":["325X1025","425X825","525X625"]},{"q":2100,"dp":0.28,"db":23,"sizes":["325X1225"]},{"q":2100,"dp":0.24,"db":22,"sizes":["425X1025","525X825"]},{"q":2200,"dp":1.7,"db":41,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":2200,"dp":1,"db":36,"sizes":["225x1025","325x625","425x525"]},{"q":2200,"dp":0.7,"db":31,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":2200,"dp":0.48,"db":28,"sizes":["325X1025","425X825","525X625"]},{"q":2200,"dp":0.3,"db":24,"sizes":["325X1225"]},{"q":2200,"dp":0.28,"db":23,"sizes":["425X1025","525X825"]},{"q":2300,"dp":2.3,"db":45,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":2300,"dp":1.2,"db":37,"sizes":["225x1025","325x625","425x525"]},{"q":2300,"dp":0.75,"db":33,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":2300,"dp":0.5,"db":26,"sizes":["325X1025","425X825","525X625"]},{"q":2300,"dp":0.35,"db":27,"sizes":["325X1225"]},{"q":2300,"dp":0.29,"db":23,"sizes":["425X1025","525X825"]},{"q":2300,"dp":0.2,"db":20,"sizes":["425X1225","525X1025"]},{"q":2400,"dp":1.9,"db":43,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":2400,"dp":1.4,"db":39,"sizes":["225x1025","325x625","425x525"]},{"q":2400,"dp":0.85,"db":34,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":2400,"dp":0.5,"db":31,"sizes":["325X1025","425X825","525X625"]},{"q":2400,"dp":0.38,"db":27,"sizes":["325X1225"]},{"q":2400,"dp":0.3,"db":24,"sizes":["425X1025","525X825"]},{"q":2400,"dp":0.22,"db":21,"sizes":["425X1225","525X1025"]},{"q":2500,"dp":2.1,"db":44,"sizes":["165x1225","225x825","325x525","425x425"]},{"q":2500,"dp":1.4,"db":40,"sizes":["225x1025","325x625","425x525"]},{"q":2500,"dp":0.95,"db":35,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":2500,"dp":0.58,"db":31,"sizes":["325X1025","425X825","525X625"]},{"q":2500,"dp":0.4,"db":28,"sizes":["325X1225"]},{"q":2500,"dp":0.35,"db":26,"sizes":["425X1025","525X825"]},{"q":2500,"dp":0.24,"db":23,"sizes":["425X1225","525X1025"]},{"q":2600,"dp":1.5,"db":41,"sizes":["225x1025","325x625","425x525"]},{"q":2600,"dp":1,"db":36,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":2600,"dp":0.6,"db":31,"sizes":["325X1025","425X825","525X625"]},{"q":2600,"dp":0.42,"db":29,"sizes":["325X1225"]},{"q":2600,"dp":0.38,"db":27,"sizes":["425X1025","525X825"]},{"q":2600,"dp":0.25,"db":23,"sizes":["425X1225","525X1025"]},{"q":2600,"dp":0.14,"db":18,"sizes":["525X1225"]},{"q":2800,"dp":1.7,"db":43,"sizes":["225x1025","325x625","425x525"]},{"q":2800,"dp":1.2,"db":36,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":2800,"dp":0.7,"db":33,"sizes":["325X1025","425X825","525X625"]},{"q":2800,"dp":0.55,"db":31,"sizes":["325X1225"]},{"q":2800,"dp":0.4,"db":28,"sizes":["425X1025","525X825"]},{"q":2800,"dp":0.29,"db":24,"sizes":["425X1225","525X1025"]},{"q":2800,"dp":0.17,"db":19,"sizes":["525X1225"]},{"q":3000,"dp":1.4,"db":39,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":3000,"dp":0.82,"db":37,"sizes":["325X1025","425X825","525X625"]},{"q":3000,"dp":0.55,"db":32,"sizes":["325X1225"]},{"q":3000,"dp":0.5,"db":30,"sizes":["425X1025","525X825"]},{"q":3000,"dp":0.31,"db":26,"sizes":["425X1225","525X1025"]},{"q":3000,"dp":0.22,"db":21,"sizes":["525X1225"]},{"q":3250,"dp":1.4,"db":40,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":3250,"dp":0.95,"db":38,"sizes":["325X1025","425X825","525X625"]},{"q":3250,"dp":0.7,"db":34,"sizes":["325X1225"]},{"q":3250,"dp":0.55,"db":31,"sizes":["425X1025","525X825"]},{"q":3250,"dp":0.36,"db":28,"sizes":["425X1225","525X1025"]},{"q":3250,"dp":0.24,"db":22,"sizes":["525X1225"]},{"q":3500,"dp":1.8,"db":44,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":3500,"dp":1.1,"db":40,"sizes":["325X1025","425X825","525X625"]},{"q":3500,"dp":0.8,"db":37,"sizes":["325X1225"]},{"q":3500,"dp":0.6,"db":32,"sizes":["425X1025","525X825"]},{"q":3500,"dp":0.44,"db":30,"sizes":["425X1225","525X1025"]},{"q":3500,"dp":0.25,"db":23,"sizes":["525X1225"]},{"q":3750,"dp":1.9,"db":44,"sizes":["225x1225","325x825","425x625","525x525"]},{"q":3750,"dp":1.4,"db":42,"sizes":["325X1025","425X825","525X625"]},{"q":3750,"dp":0.9,"db":38,"sizes":["325X1225"]},{"q":3750,"dp":0.7,"db":33,"sizes":["425X1025","525X825"]},{"q":3750,"dp":0.5,"db":31,"sizes":["425X1225","525X1025"]},{"q":3750,"dp":0.3,"db":25,"sizes":["525X1225"]},{"q":4000,"dp":1.4,"db":42,"sizes":["325X1025","425X825","525X625"]},{"q":4000,"dp":1.1,"db":39,"sizes":["325X1225"]},{"q":4000,"dp":0.85,"db":36,"sizes":["425X1025","525X825"]},{"q":4000,"dp":0.57,"db":33,"sizes":["425X1225","525X1025"]},{"q":4000,"dp":0.36,"db":29,"sizes":["525X1225"]},{"q":4500,"dp":1.8,"db":46,"sizes":["325X1025","425X825","525X625"]},{"q":4500,"dp":1.4,"db":43,"sizes":["325X1225"]},{"q":4500,"dp":1.2,"db":38,"sizes":["425X1025","525X825"]},{"q":4500,"dp":0.7,"db":34,"sizes":["425X1225","525X1025"]},{"q":4500,"dp":0.45,"db":30,"sizes":["525X1225"]},{"q":5000,"dp":2.3,"db":49,"sizes":["325X1025","425X825","525X625"]},{"q":5000,"dp":1.7,"db":45,"sizes":["325X1225"]},{"q":5000,"dp":1.4,"db":41,"sizes":["425X1025","525X825"]},{"q":5000,"dp":0.9,"db":39,"sizes":["425X1225","525X1025"]},{"q":5000,"dp":0.55,"db":33,"sizes":["525X1225"]},{"q":5500,"dp":1.8,"db":47,"sizes":["325X1225"]},{"q":5500,"dp":1.7,"db":44,"sizes":["425X1025","525X825"]},{"q":5500,"dp":1,"db":40,"sizes":["425X1225","525X1025"]},{"q":5500,"dp":0.7,"db":34,"sizes":["525X1225"]},{"q":6000,"dp":2.4,"db":49,"sizes":["325X1225"]},{"q":6000,"dp":1.8,"db":46,"sizes":["425X1025","525X825"]},{"q":6000,"dp":1.4,"db":43,"sizes":["425X1225","525X1025"]},{"q":6000,"dp":0.8,"db":38,"sizes":["525X1225"]}];
+let resultados=[]; let selecionada=null; let ordemAtual='proxima';
+const get=id=>document.getElementById(id);
+const num=id=>Number(get(id).value)||0;
+const fmt=(n,c=2)=>Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:c,maximumFractionDigits:c});
+const badge=(txt,tipo)=>`<span class="badge ${tipo}">${txt}</span>`;
+function calcular(){
+const identificacao = document.getElementById('identificacaoEntrada').value;
+document.getElementById('identificacaoPreview').value = identificacao;
+  const vazao=num('vazao'), qtd=Math.max(1,Math.round(num('qtd'))), dpmax=num('dpmax'), dbmax=num('dbmax');
+  const qg=vazao/qtd;
+  get('kVazao').textContent=fmt(vazao,0)+' m³/h';
+  get('kPorGrelha').textContent=fmt(qg,0)+' m³/h';
+  get('kDp').textContent=fmt(dpmax,1)+' mmCA';
+  get('kDb').textContent=fmt(dbmax,0)+' dB(A)';
+  resultados=GRELHAS.map((o,i)=>{
+    const atendeQ=o.q>=qg;
+    const atendeDp=o.dp<=dpmax;
+    const atendeDb=o.db<=dbmax;
+    const ok=atendeQ&&atendeDp&&atendeDb;
+    const folgaQ=o.q-qg;
+    const score=(ok?0:1000000)+Math.max(0,qg-o.q)*1000+Math.abs(folgaQ)+o.dp*4+o.db*2;
+    return {...o,id:i,atendeQ,atendeDp,atendeDb,ok,folgaQ,score};
+  });
+  aplicarOrdem();
+  const aprovadas=resultados.filter(x=>x.ok);
+  if(!selecionada && aprovadas.length) selecionada={id:aprovadas[0].id,size:aprovadas[0].sizes[0]};
+  renderTabela();
+  renderResumo();
+}
+function aplicarOrdem(){
+  resultados.sort((a,b)=>{
+    if(ordemAtual==='menorDp') return (a.ok?0:1)-(b.ok?0:1) || a.dp-b.dp || Math.abs(a.folgaQ)-Math.abs(b.folgaQ);
+    if(ordemAtual==='menorDb') return (a.ok?0:1)-(b.ok?0:1) || a.db-b.db || Math.abs(a.folgaQ)-Math.abs(b.folgaQ);
+    return (a.ok?0:1)-(b.ok?0:1) || Math.abs(a.folgaQ)-Math.abs(b.folgaQ) || a.dp-b.dp || a.db-b.db;
+  });
+}
+function ordenar(tipo){ordemAtual=tipo; aplicarOrdem(); renderTabela();}
+function selecionar(id,size){selecionada={id:id,size:size}; renderTabela(); renderResumo();}
+function limparSelecao(){selecionada=null; renderTabela(); renderResumo();}
+function renderResumo(){
+  const aprovadas=resultados.filter(x=>x.ok);
+  const sel=resultados.find(x=>selecionada && x.id===selecionada.id) || aprovadas[0];
+  get('status').textContent=`${aprovadas.length} opção(ões) atendem aos critérios`;
+  if(!sel){
+    get('resumo').innerHTML='Nenhuma opção atende aos critérios informados. Aumente o limite de ∆p/ruído, reduza a vazão por grelha ou aumente o número de grelhas.';
+    get('impIdentificacao').textContent=get('identificacaoEntrada').value || '-';
+    get('impTamanho').textContent='-';
+    get('impStatus').innerHTML='<span class="report-status bad">NÃO ATENDE</span>';
+    get('impVazaoTotal').textContent=get('kVazao').textContent;
+    get('impVazaoGrelha').textContent=get('kPorGrelha').textContent;
+    get('impVazaoTabela').textContent='-';
+    get('impDp').textContent='-';
+    get('impDb').textContent='-';
+    get('impLimites').textContent=get('kDp').textContent+' | '+get('kDb').textContent;
+    get('impOpcoes').textContent='Nenhuma opção disponível';
+    return;
+  }
+  const titulo=(selecionada && sel.id===selecionada.id)?'Opção selecionada':'Melhor opção automática';
+  const tamanhoEscolhido=(selecionada && sel.id===selecionada.id)?selecionada.size:sel.sizes[0];
+
+  get('impIdentificacao').textContent=get('identificacaoEntrada').value || '-';
+  get('impTamanho').textContent=tamanhoEscolhido;
+  get('impStatus').innerHTML=sel.ok?'<span class="report-status ok">ATENDE</span>':'<span class="report-status bad">NÃO ATENDE</span>';
+  get('impVazaoTotal').textContent=get('kVazao').textContent;
+  get('impVazaoGrelha').textContent=get('kPorGrelha').textContent;
+  get('impVazaoTabela').textContent=fmt(sel.q,0)+' m³/h';
+  get('impDp').textContent=fmt(sel.dp,2)+' mmCA';
+  get('impDb').textContent=fmt(sel.db,0)+' dB(A)';
+  get('impLimites').textContent=get('kDp').textContent+' | '+get('kDb').textContent;
+  get('impOpcoes').textContent=sel.sizes.join(' / ');
+
+  get('resumo').innerHTML=`<b>${titulo}:</b> <span class="badge ok">${tamanhoEscolhido}</span><br>
+  Vazão de tabela: <b>${fmt(sel.q,0)} m³/h</b> | ∆p: <b>${fmt(sel.dp,2)} mmCA</b> | Ruído: <b>${fmt(sel.db,0)} dB(A)</b><br>
+  Opções disponíveis nesta linha: <b>${sel.sizes.join(' / ')}</b><br>
+  Status: ${sel.ok?badge('ATENDE','ok'):badge('NÃO ATENDE','bad')}`;
+}
+function renderTabela(){
+  const filtro=get('filtro').value;
+  const lista=(filtro==='aprovadas'?resultados.filter(x=>x.ok):resultados);
+  get('tbody').innerHTML=lista.map(o=>{
+    const linhaSelecionada=selecionada && o.id===selecionada.id;
+    const botoesTamanho=o.sizes.map(s=>`<button class="size-btn ${linhaSelecionada && selecionada.size===s?'active':''}" ${o.ok?'': 'disabled'} onclick="selecionar(${o.id},'${s}')">${linhaSelecionada && selecionada.size===s?'✓ ':''}${s}</button>`).join('');
+    return `<tr class="${linhaSelecionada?'selected':(o.ok?'okrow':'badrow')}">
+    <td>${linhaSelecionada?badge('ESCOLHIDA','ok'):(o.ok?badge('Escolha ao lado','warn'):'-')}</td>
+    <td>${fmt(o.q,0)}</td><td>${fmt(o.dp,2)}</td><td>${fmt(o.db,0)}</td><td><div class="size-options">${botoesTamanho}</div></td>
+    <td>${o.atendeQ?badge('SIM','ok'):badge('NÃO','bad')}</td><td>${o.atendeDp?badge('SIM','ok'):badge('NÃO','bad')}</td><td>${o.atendeDb?badge('SIM','ok'):badge('NÃO','bad')}</td>
+    <td>${o.ok?badge('ATENDE','ok'):badge('NÃO ATENDE','bad')}</td>
+  </tr>`;
+  }).join('');
+}
+function imprimirPDF(){window.print();}
+['identificacaoEntrada','vazao','qtd','dpmax','dbmax','filtro'].forEach(id=>get(id).addEventListener('input',calcular));
+calcular();
+</script>
+
+
+<script>
+(function(){
+  var current=(location.pathname.split('/').pop()||'home.html');
+  if(current==='home(1).html') current='home.html';
+  var links=document.querySelectorAll('.nav-links a');
+  for(var i=0;i<links.length;i++){
+    if(links[i].getAttribute('data-page')===current){links[i].classList.add('active');}
+  }
+})();
+</script>
+
+</body>
+</html>
