@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dimensionamento da Ventilação da Subestação</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
+:root{
+  --primary:#0f4fbf;--dark:#0b2d75;--bg:#f4f7fb;--card:#fff;
+  --text:#172033;--muted:#607086;--border:#d8dee9;--soft:#eef3ff;
+  --success:#0f766e;--danger:#b91c1c;--warning:#b7791f
+}
+body{background:var(--bg);color:var(--text)}
+.app-nav{position:sticky;top:0;z-index:999;background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;box-shadow:0 8px 24px rgba(15,23,42,.16)}
+.app-nav-inner{max-width:1300px;margin:auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.brand{color:#fff;text-decoration:none;font-weight:800;font-size:18px;white-space:nowrap}
+.nav-links{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.nav-links a{color:#eaf1ff;text-decoration:none;font-weight:700;font-size:13px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
+.nav-links a:hover,.nav-links a.active{background:#fff;color:var(--dark)}
+.container{max-width:1300px;margin:22px auto;padding:0 16px 40px}
+.hero{margin-bottom:18px}
+h1{font-size:28px;color:var(--dark);margin-bottom:6px}
+.subtitle{color:var(--muted);line-height:1.5}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 22px rgba(15,23,42,.06);padding:20px}
+.sticky{position:sticky;top:82px}
+h2{color:var(--dark);font-size:20px;margin-bottom:10px}
+h3{color:var(--dark);font-size:17px;margin-bottom:8px}
+.section-note{font-size:12px;color:var(--muted);line-height:1.45;margin-bottom:12px}
+label{display:block;margin-top:13px;font-weight:700;font-size:13px}
+input,select,button{width:100%;padding:10px;margin-top:6px;border:1px solid #cbd5df;border-radius:10px;font-size:14px;background:#fff}
+input:focus,select:focus{outline:2px solid rgba(15,79,191,.18);border-color:var(--primary)}
+button{background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:800;transition:.2s}
+button:hover{filter:brightness(.95)}
+button.secondary{background:var(--success)}
+button.danger{background:var(--danger)}
+button.ghost{background:#fff;color:var(--dark);border:1px solid var(--border)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.results-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.result-box{padding:13px;border-radius:12px;background:#f8fafc;border:1px solid var(--border)}
+.result-box .label{font-size:12px;color:var(--muted);margin-bottom:5px}
+.result-box .value{font-size:20px;font-weight:800;color:var(--dark)}
+.result-box .sub{font-size:12px;color:var(--muted);margin-top:3px}
+.warning{margin-top:14px;padding:12px;border-radius:10px;background:#fff8e8;border:1px solid #f2d38b;color:#744b00;font-size:12px;line-height:1.45}
+.content-stack{display:grid;gap:20px}
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:920px}
+th,td{padding:9px 8px;border-bottom:1px solid var(--border);vertical-align:middle;text-align:left;font-size:12px}
+th{background:var(--soft);color:var(--dark);font-weight:800;position:sticky;top:0}
+td input,td select{margin:0;padding:8px;font-size:12px;min-width:90px}
+td .readonly{background:#f4f7fb;color:#314158}
+.row-actions{display:flex;gap:6px}
+.row-actions button{width:auto;margin:0;padding:7px 10px}
+.total-line{margin-top:12px;display:flex;justify-content:flex-end;gap:8px;align-items:center;font-weight:800;color:var(--dark)}
+.total-line strong{font-size:18px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.toolbar button{width:auto;padding:9px 14px;margin:0}
+.formula-box{font-size:13px;line-height:1.55;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:14px}
+.formula-box code{display:block;margin-top:6px;padding:8px;background:#eef3ff;border-radius:8px;overflow:auto;color:#0b2d75}
+.footer-note{font-size:12px;color:var(--muted);text-align:center;margin-top:20px}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.sticky{position:static}.results-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.app-nav-inner{align-items:flex-start;flex-direction:column}.nav-links{justify-content:flex-start}.actions,.results-grid{grid-template-columns:1fr}h1{font-size:24px}}
+@media print{
+  .app-nav,.toolbar,.row-actions,.actions{display:none!important}
+  body{background:#fff}.container{max-width:none;margin:0;padding:10mm}.layout{display:block}.sticky{position:static}
+  .card{box-shadow:none;break-inside:avoid;margin-bottom:12px}.table-wrap{overflow:visible}table{min-width:0}
+}
+</style>
+</head>
+<body>
+<nav class="app-nav">
+  <div class="app-nav-inner">
+    <a class="brand" href="home.html">Seletores AVAC</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="Difusor_Quadrado.html">Difusor Quadrado</a>
+      <a href="Grelhas.html">Grelhas</a>
+      <a href="Sala_de_Cirurgia.html">Sala de Cirurgia</a>
+      <a href="Arquitetura.html">Arquitetura</a>
+      <a href="ventilacao_subestacao.html">Ventilação de Subestação</a>
+      <a href="Diesel.html">Diesel</a>
+      <a href="Exaustao_Cozinha.html">Exaustão de Cozinha</a>
+      <a href="GLP e GN.html">GLP e GN</a>
+      <a href="Linha de Vida.html">Linha de Vida</a>
+      <a href="Plano_Higgs.html">Plano de Rigging</a>
+      <a href="Pressurizacao.html">Pressurização Escada</a>
+
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <header class="hero">
+    <h1>Dimensionamento da Ventilação da Subestação</h1>
+    <p class="subtitle">Cálculo da carga térmica dissipada por transformadores, barramentos e cabos, com determinação automática da vazão de ar e da área de venezianas.</p>
+  </header>
+
+  <div class="layout">
+    <aside class="card sticky">
+      <h2>Parâmetros de projeto</h2>
+      <p class="section-note">Os resultados são atualizados automaticamente ao alterar qualquer campo.</p>
+
+      <label for="tExt">Temperatura externa (°C)</label>
+      <input id="tExt" type="number" value="30" step="0.1">
+
+      <label for="tInt">Temperatura interna (°C)</label>
+      <input id="tInt" type="number" value="35" step="0.1">
+
+      <label for="safety">Fator de segurança</label>
+      <input id="safety" type="number" value="1.10" step="0.01" min="1">
+
+      <label for="airDensity">Massa específica do ar (kg/m³)</label>
+      <input id="airDensity" type="number" value="1.20" step="0.01" min="0.1">
+
+      <label for="airCp">Calor específico do ar (J/kg·K)</label>
+      <input id="airCp" type="number" value="1005" step="1" min="1">
+
+      <label for="faceVelocity">Velocidade de face adotada (m/s)</label>
+      <input id="faceVelocity" type="number" value="2.00" step="0.1" min="0.01">
+
+      <label for="freeArea">Fração de área livre da veneziana</label>
+      <input id="freeArea" type="number" value="0.60" step="0.01" min="0.01" max="1">
+
+      <div class="actions">
+        <button onclick="calculateAll()">Calcular</button>
+        <button class="secondary" onclick="window.print()">Imprimir / PDF</button>
+        <button class="ghost" onclick="saveProject()">Salvar dados</button>
+        <button class="danger" onclick="resetProject()">Limpar</button>
+      </div>
+
+      <div class="results-grid">
+        <div class="result-box">
+          <div class="label">Carga térmica total</div>
+          <div class="value" id="totalW">0 W</div>
+          <div class="sub" id="totalBtu">0 BTU/h</div>
+        </div>
+        <div class="result-box">
+          <div class="label">Com segurança</div>
+          <div class="value" id="safeW">0 W</div>
+          <div class="sub" id="safeBtu">0 BTU/h</div>
+        </div>
+        <div class="result-box">
+          <div class="label">Vazão necessária</div>
+          <div class="value" id="airflowM3h">0 m³/h</div>
+          <div class="sub" id="airflowLs">0 L/s</div>
+        </div>
+        <div class="result-box">
+          <div class="label">Área livre total</div>
+          <div class="value" id="freeAreaResult">0 m²</div>
+          <div class="sub">Área efetiva de passagem</div>
+        </div>
+        <div class="result-box" style="grid-column:1/-1">
+          <div class="label">Área geométrica total de venezianas</div>
+          <div class="value" id="grilleArea">0 m²</div>
+          <div class="sub">Considerando a fração de área livre informada</div>
+        </div>
+      </div>
+
+      <div class="warning" id="warningBox">A temperatura interna deve ser maior que a externa para que o cálculo por remoção de calor sensível seja válido.</div>
+    </aside>
+
+    <main class="content-stack">
+      <section class="card">
+        <h2>Transformadores</h2>
+        <p class="section-note">Perda adotada = quantidade × [perda em vazio + perda em plena carga × (carregamento)²]. Em 100%, reproduz a lógica da planilha.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Equipamento</th><th>Local / ambiente</th><th>Qtd.</th><th>Carregamento (%)</th>
+              <th>Perda em vazio (W)</th><th>Perda em carga (W)</th><th>Perda total (W)</th><th>Observações</th><th></th>
+            </tr></thead>
+            <tbody id="transformerRows"></tbody>
+          </table>
+        </div>
+        <div class="toolbar"><button onclick="addTransformer()">Adicionar transformador</button></div>
+        <div class="total-line">Subtotal: <strong id="transformerSubtotal">0 W</strong></div>
+      </section>
+
+      <section class="card">
+        <h2>Barramentos</h2>
+        <p class="section-note">Perda por efeito Joule: P = ρ × L × I² ÷ A. O comprimento deve representar o total efetivo de barras conduzindo a corrente, ou use a coluna quantidade.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Barramento</th><th>Qtd.</th><th>Comprimento unit. (m)</th><th>Largura (mm)</th>
+              <th>Espessura (mm)</th><th>Corrente (A)</th><th>Resistividade (Ω·m)</th><th>Perda total (W)</th><th>Observações</th><th></th>
+            </tr></thead>
+            <tbody id="busbarRows"></tbody>
+          </table>
+        </div>
+        <div class="toolbar"><button onclick="addBusbar()">Adicionar barramento</button></div>
+        <div class="total-line">Subtotal: <strong id="busbarSubtotal">0 W</strong></div>
+      </section>
+
+      <section class="card">
+        <h2>Cabos</h2>
+        <p class="section-note">O valor cadastrado é o diâmetro equivalente do cobre. A área usada no cálculo é A = πd²/4.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Cabo</th><th>Qtd.</th><th>Comprimento unit. (m)</th><th>Diâmetro equivalente (mm)</th>
+              <th>Área calculada (mm²)</th><th>Corrente por condutor (A)</th><th>Resistividade (Ω·m)</th><th>Perda total (W)</th><th>Observações</th><th></th>
+            </tr></thead>
+            <tbody id="cableRows"></tbody>
+          </table>
+        </div>
+        <div class="toolbar"><button onclick="addCable()">Adicionar cabo</button></div>
+        <div class="total-line">Subtotal: <strong id="cableSubtotal">0 W</strong></div>
+      </section>
+
+      <section class="card">
+        <h2>Memória de cálculo</h2>
+        <div class="formula-box">
+          <strong>Vazão de ar por balanço térmico</strong>
+          <code>Q (m³/h) = Psegurança × 3600 ÷ [ρar × cpar × (Tinterna − Texterna)]</code>
+          <strong>Área livre de ventilação</strong>
+          <code>Alivre = (Q ÷ 3600) ÷ velocidade de face</code>
+          <strong>Área geométrica de venezianas</strong>
+          <code>Ageométrica = Alivre ÷ fração de área livre</code>
+          <strong>Perda em barramentos e cabos</strong>
+          <code>P = I² × R &nbsp;&nbsp; e &nbsp;&nbsp; R = ρ × L ÷ A</code>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <p class="footer-note">Ferramenta para estudo e pré-dimensionamento. Verifique os dados dos fabricantes e os critérios do projeto executivo.</p>
+</div>
+
+<script>
+const TRANSFORMERS = [{"name": "Transformador 15 KVA", "empty": 100, "full": 700}, {"name": "Transformador 30 KVA", "empty": 170, "full": 800}, {"name": "Transformador 45 KVA", "empty": 220, "full": 1150}, {"name": "Transformador 75 KVA", "empty": 300, "full": 1700}, {"name": "Transformador 112,5 KVA", "empty": 400, "full": 2500}, {"name": "Transformador 150 KVA", "empty": 500, "full": 3300}, {"name": "Transformador 225 KVA", "empty": 680, "full": 4500}, {"name": "Transformador 300 KVA", "empty": 850, "full": 5800}, {"name": "Transformador 500 KVA", "empty": 1350, "full": 8000}, {"name": "Transformador 750 KVA", "empty": 1850, "full": 11500}, {"name": "Transformador 1000 KVA", "empty": 2300, "full": 15000}];
+const BUSBARS = [{"name": "12x2 50ºC", "rho": 1.927e-08, "width": 12, "thickness": 2}, {"name": "12x2 60ºC", "rho": 1.995e-08, "width": 12, "thickness": 2}, {"name": "12x2 70ºC", "rho": 2.063e-08, "width": 12, "thickness": 2}, {"name": "15x2 50ºC", "rho": 1.927e-08, "width": 15, "thickness": 2}, {"name": "15x2 60ºC", "rho": 1.995e-08, "width": 15, "thickness": 2}, {"name": "15x2 70ºC", "rho": 2.063e-08, "width": 15, "thickness": 2}, {"name": "15x3 50ºC", "rho": 1.927e-08, "width": 15, "thickness": 3}, {"name": "15x3 60ºC", "rho": 1.995e-08, "width": 15, "thickness": 3}, {"name": "15x3 70ºC", "rho": 2.063e-08, "width": 15, "thickness": 3}, {"name": "20x2 50ºC", "rho": 1.927e-08, "width": 20, "thickness": 2}, {"name": "20x2 60ºC", "rho": 1.995e-08, "width": 20, "thickness": 2}, {"name": "20x2 70ºC", "rho": 2.063e-08, "width": 20, "thickness": 2}, {"name": "20x3 50ºC", "rho": 1.927e-08, "width": 20, "thickness": 3}, {"name": "20x3 60ºC", "rho": 1.995e-08, "width": 20, "thickness": 3}, {"name": "20x3 70ºC", "rho": 2.063e-08, "width": 20, "thickness": 3}, {"name": "20x5 50ºC", "rho": 1.927e-08, "width": 20, "thickness": 5}, {"name": "20x5 60ºC", "rho": 1.995e-08, "width": 20, "thickness": 5}, {"name": "20x5 70ºC", "rho": 2.063e-08, "width": 20, "thickness": 5}, {"name": "20x10 50ºC", "rho": 1.927e-08, "width": 20, "thickness": 10}, {"name": "20x10 60ºC", "rho": 1.995e-08, "width": 20, "thickness": 10}, {"name": "20x10 70ºC", "rho": 2.063e-08, "width": 20, "thickness": 10}, {"name": "25x3 50ºC", "rho": 1.927e-08, "width": 25, "thickness": 3}, {"name": "25x3 60ºC", "rho": 1.995e-08, "width": 25, "thickness": 3}, {"name": "25x3 70ºC", "rho": 2.063e-08, "width": 25, "thickness": 3}, {"name": "25x5 50ºC", "rho": 1.927e-08, "width": 25, "thickness": 5}, {"name": "25x5 60ºC", "rho": 1.995e-08, "width": 25, "thickness": 5}, {"name": "25x5 70ºC", "rho": 2.063e-08, "width": 25, "thickness": 5}, {"name": "30x3 50ºC", "rho": 1.927e-08, "width": 30, "thickness": 3}, {"name": "30x3 60ºC", "rho": 1.995e-08, "width": 30, "thickness": 3}, {"name": "30x3 70ºC", "rho": 2.063e-08, "width": 30, "thickness": 3}, {"name": "30x5 50ºC", "rho": 1.927e-08, "width": 30, "thickness": 5}, {"name": "30x5 60ºC", "rho": 1.995e-08, "width": 30, "thickness": 5}, {"name": "30x5 70ºC", "rho": 2.063e-08, "width": 30, "thickness": 5}, {"name": "30x10 50ºC", "rho": 1.927e-08, "width": 30, "thickness": 10}, {"name": "30x10 60ºC", "rho": 1.995e-08, "width": 30, "thickness": 10}, {"name": "30x10 70ºC", "rho": 2.063e-08, "width": 30, "thickness": 10}, {"name": "40x3 50ºC", "rho": 1.927e-08, "width": 40, "thickness": 3}, {"name": "40x3 60ºC", "rho": 1.995e-08, "width": 40, "thickness": 3}, {"name": "40x3 70ºC", "rho": 2.063e-08, "width": 40, "thickness": 3}, {"name": "40x5 50ºC", "rho": 1.927e-08, "width": 40, "thickness": 5}, {"name": "40x5 60ºC", "rho": 1.995e-08, "width": 40, "thickness": 5}, {"name": "40x5 70ºC", "rho": 2.063e-08, "width": 40, "thickness": 5}, {"name": "40x10 50ºC", "rho": 1.927e-08, "width": 40, "thickness": 10}, {"name": "40x10 60ºC", "rho": 1.995e-08, "width": 40, "thickness": 10}, {"name": "40x10 70ºC", "rho": 2.063e-08, "width": 40, "thickness": 10}, {"name": "50x5 50ºC", "rho": 1.927e-08, "width": 50, "thickness": 5}, {"name": "50x5 60ºC", "rho": 1.995e-08, "width": 50, "thickness": 5}, {"name": "50x5 70ºC", "rho": 2.063e-08, "width": 50, "thickness": 5}, {"name": "50x10 50ºC", "rho": 1.927e-08, "width": 50, "thickness": 10}, {"name": "50x10 60ºC", "rho": 1.995e-08, "width": 50, "thickness": 10}, {"name": "50x10 70ºC", "rho": 2.063e-08, "width": 50, "thickness": 10}, {"name": "60x5 50ºC", "rho": 1.927e-08, "width": 60, "thickness": 5}, {"name": "60x5 60ºC", "rho": 1.995e-08, "width": 60, "thickness": 5}, {"name": "60x5 70ºC", "rho": 2.063e-08, "width": 60, "thickness": 5}, {"name": "60x10 50ºC", "rho": 1.927e-08, "width": 60, "thickness": 10}, {"name": "60x10 60ºC", "rho": 1.995e-08, "width": 60, "thickness": 10}, {"name": "60x10 70ºC", "rho": 2.063e-08, "width": 60, "thickness": 10}, {"name": "80x5 50ºC", "rho": 1.927e-08, "width": 80, "thickness": 5}, {"name": "80x5 60ºC", "rho": 1.995e-08, "width": 80, "thickness": 5}, {"name": "80x5 70ºC", "rho": 2.063e-08, "width": 80, "thickness": 5}, {"name": "80x10 50ºC", "rho": 1.927e-08, "width": 80, "thickness": 10}, {"name": "80x10 60ºC", "rho": 1.995e-08, "width": 80, "thickness": 10}, {"name": "80x10 70ºC", "rho": 2.063e-08, "width": 80, "thickness": 10}, {"name": "100x5 50ºC", "rho": 1.927e-08, "width": 100, "thickness": 5}, {"name": "100x5 60ºC", "rho": 1.995e-08, "width": 100, "thickness": 5}, {"name": "100x5 70ºC", "rho": 2.063e-08, "width": 100, "thickness": 5}, {"name": "100x10 50ºC", "rho": 1.927e-08, "width": 100, "thickness": 10}, {"name": "100x10 60ºC", "rho": 1.995e-08, "width": 100, "thickness": 10}, {"name": "100x10 70ºC", "rho": 2.063e-08, "width": 100, "thickness": 10}, {"name": "120x10 50ºC", "rho": 1.927e-08, "width": 120, "thickness": 10}, {"name": "120x10 60ºC", "rho": 1.995e-08, "width": 120, "thickness": 10}, {"name": "120x10 70ºC", "rho": 2.063e-08, "width": 120, "thickness": 10}, {"name": "160x10 50ºC", "rho": 1.927e-08, "width": 160, "thickness": 10}, {"name": "160x10 60ºC", "rho": 1.995e-08, "width": 160, "thickness": 10}, {"name": "160x10 70ºC", "rho": 2.063e-08, "width": 160, "thickness": 10}, {"name": "200x10 50ºC", "rho": 1.927e-08, "width": 200, "thickness": 10}, {"name": "200x10 60ºC", "rho": 1.995e-08, "width": 200, "thickness": 10}, {"name": "200x10 70ºC", "rho": 2.063e-08, "width": 200, "thickness": 10}];
+const CABLES = [{"name": "Cabo 2,5mm² 50°C", "rho": 1.927e-08, "diameter": 1.78, "section": 2.5}, {"name": "Cabo 2,5mm² 60°C", "rho": 1.995e-08, "diameter": 1.78, "section": 2.5}, {"name": "Cabo 2,5mm² 70°C", "rho": 2.063e-08, "diameter": 1.78, "section": 2.5}, {"name": "Cabo 4mm² 50°C", "rho": 1.927e-08, "diameter": 2.26, "section": 4}, {"name": "Cabo 4mm² 60°C", "rho": 1.995e-08, "diameter": 2.26, "section": 4}, {"name": "Cabo 4mm² 70°C", "rho": 2.063e-08, "diameter": 2.26, "section": 4}, {"name": "Cabo 6mm² 50°C", "rho": 1.927e-08, "diameter": 2.76, "section": 6}, {"name": "Cabo 6mm² 60°C", "rho": 1.995e-08, "diameter": 2.76, "section": 6}, {"name": "Cabo 6mm² 70°C", "rho": 2.063e-08, "diameter": 2.76, "section": 6}, {"name": "Cabo 10mm² 50°C", "rho": 1.927e-08, "diameter": 3.57, "section": 10}, {"name": "Cabo 10mm² 60°C", "rho": 1.995e-08, "diameter": 3.57, "section": 10}, {"name": "Cabo 10mm² 70°C", "rho": 2.063e-08, "diameter": 3.57, "section": 10}, {"name": "Cabo 16mm² 50°C", "rho": 1.927e-08, "diameter": 4.51, "section": 16}, {"name": "Cabo 16mm² 60°C", "rho": 1.995e-08, "diameter": 4.51, "section": 16}, {"name": "Cabo 16mm² 70°C", "rho": 2.063e-08, "diameter": 4.51, "section": 16}, {"name": "Cabo 25mm² 50°C", "rho": 1.927e-08, "diameter": 5.64, "section": 25}, {"name": "Cabo 25mm² 60°C", "rho": 1.995e-08, "diameter": 5.64, "section": 25}, {"name": "Cabo 25mm² 70°C", "rho": 2.063e-08, "diameter": 5.64, "section": 25}, {"name": "Cabo 35mm² 50°C", "rho": 1.927e-08, "diameter": 6.68, "section": 35}, {"name": "Cabo 35mm² 60°C", "rho": 1.995e-08, "diameter": 6.68, "section": 35}, {"name": "Cabo 35mm² 70°C", "rho": 2.063e-08, "diameter": 6.68, "section": 35}, {"name": "Cabo 50mm² 50°C", "rho": 1.927e-08, "diameter": 7.98, "section": 50}, {"name": "Cabo 50mm² 60°C", "rho": 1.995e-08, "diameter": 7.98, "section": 50}, {"name": "Cabo 50mm² 70°C", "rho": 2.063e-08, "diameter": 7.98, "section": 50}, {"name": "Cabo 70mm² 50°C", "rho": 1.927e-08, "diameter": 9.44, "section": 70}, {"name": "Cabo 70mm² 60°C", "rho": 1.995e-08, "diameter": 9.44, "section": 70}, {"name": "Cabo 70mm² 70°C", "rho": 2.063e-08, "diameter": 9.44, "section": 70}, {"name": "Cabo 95mm² 50°C", "rho": 1.927e-08, "diameter": 11, "section": 95}, {"name": "Cabo 95mm² 60°C", "rho": 1.995e-08, "diameter": 11, "section": 95}, {"name": "Cabo 95mm² 70°C", "rho": 2.063e-08, "diameter": 11, "section": 95}, {"name": "Cabo 120mm² 50°C", "rho": 1.927e-08, "diameter": 12.36, "section": 120}, {"name": "Cabo 120mm² 60°C", "rho": 1.995e-08, "diameter": 12.36, "section": 120}, {"name": "Cabo 120mm² 70°C", "rho": 2.063e-08, "diameter": 12.36, "section": 120}, {"name": "Cabo 150mm² 50°C", "rho": 1.927e-08, "diameter": 13.82, "section": 150}, {"name": "Cabo 150mm² 60°C", "rho": 1.995e-08, "diameter": 13.82, "section": 150}, {"name": "Cabo 150mm² 70°C", "rho": 2.063e-08, "diameter": 13.82, "section": 150}, {"name": "Cabo 185mm² 50°C", "rho": 1.927e-08, "diameter": 15.35, "section": 185}, {"name": "Cabo 185mm² 60°C", "rho": 1.995e-08, "diameter": 15.35, "section": 185}, {"name": "Cabo 185mm² 70°C", "rho": 2.063e-08, "diameter": 15.35, "section": 185}, {"name": "Cabo 240mm² 50°C", "rho": 1.927e-08, "diameter": 17.48, "section": 240}, {"name": "Cabo 240mm² 60°C", "rho": 1.995e-08, "diameter": 17.48, "section": 240}, {"name": "Cabo 240mm² 70°C", "rho": 2.063e-08, "diameter": 17.48, "section": 240}];
+
+const br = (n, d=2) => Number(n || 0).toLocaleString('pt-BR', {minimumFractionDigits:d, maximumFractionDigits:d});
+const num = id => parseFloat(document.getElementById(id).value) || 0;
+
+function optionList(items, selected=''){
+  return items.map((x,i)=>`<option value="${i}" ${x.name===selected?'selected':''}>${x.name}</option>`).join('');
+}
+function rowDelete(btn){ btn.closest('tr').remove(); calculateAll(); }
+
+function addTransformer(data={}){
+  const tbody=document.getElementById('transformerRows');
+  const tr=document.createElement('tr');
+  const idx=Math.max(0,TRANSFORMERS.findIndex(x=>x.name===(data.name||'Transformador 30 KVA')));
+  tr.innerHTML=`
+    <td><select class="tr-type">${optionList(TRANSFORMERS, TRANSFORMERS[idx].name)}</select></td>
+    <td><input class="tr-location" value="${data.location||''}" placeholder="Ex.: Sala elétrica"></td>
+    <td><input class="tr-qty" type="number" min="0" step="1" value="${data.qty??1}"></td>
+    <td><input class="tr-load" type="number" min="0" max="100" step="1" value="${data.load??100}"></td>
+    <td><input class="tr-empty readonly" readonly></td>
+    <td><input class="tr-full readonly" readonly></td>
+    <td><input class="tr-total readonly" readonly></td>
+    <td><input class="tr-note" value="${data.note||''}"></td>
+    <td class="row-actions"><button class="danger" onclick="rowDelete(this)">×</button></td>`;
+  tbody.appendChild(tr);
+  tr.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',calculateAll));
+  calculateAll();
+}
+
+function addBusbar(data={}){
+  const tbody=document.getElementById('busbarRows');
+  const tr=document.createElement('tr');
+  const defaultName=data.name||'120x10 70ºC';
+  const idx=Math.max(0,BUSBARS.findIndex(x=>x.name===defaultName));
+  tr.innerHTML=`
+    <td><select class="bb-type">${optionList(BUSBARS,BUSBARS[idx].name)}</select></td>
+    <td><input class="bb-qty" type="number" min="0" step="1" value="${data.qty??1}"></td>
+    <td><input class="bb-length" type="number" min="0" step="0.01" value="${data.length??3}"></td>
+    <td><input class="bb-width readonly" readonly></td>
+    <td><input class="bb-thick readonly" readonly></td>
+    <td><input class="bb-current" type="number" min="0" step="1" value="${data.current??2500}"></td>
+    <td><input class="bb-rho readonly" readonly></td>
+    <td><input class="bb-total readonly" readonly></td>
+    <td><input class="bb-note" value="${data.note||''}"></td>
+    <td class="row-actions"><button class="danger" onclick="rowDelete(this)">×</button></td>`;
+  tbody.appendChild(tr);
+  tr.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',calculateAll));
+  calculateAll();
+}
+
+function addCable(data={}){
+  const tbody=document.getElementById('cableRows');
+  const tr=document.createElement('tr');
+  const defaultName=data.name||'Cabo 6mm² 70°C';
+  const idx=Math.max(0,CABLES.findIndex(x=>x.name===defaultName));
+  tr.innerHTML=`
+    <td><select class="cb-type">${optionList(CABLES,CABLES[idx].name)}</select></td>
+    <td><input class="cb-qty" type="number" min="0" step="1" value="${data.qty??1}"></td>
+    <td><input class="cb-length" type="number" min="0" step="0.01" value="${data.length??2}"></td>
+    <td><input class="cb-dia readonly" readonly></td>
+    <td><input class="cb-area readonly" readonly></td>
+    <td><input class="cb-current" type="number" min="0" step="1" value="${data.current??250}"></td>
+    <td><input class="cb-rho readonly" readonly></td>
+    <td><input class="cb-total readonly" readonly></td>
+    <td><input class="cb-note" value="${data.note||''}"></td>
+    <td class="row-actions"><button class="danger" onclick="rowDelete(this)">×</button></td>`;
+  tbody.appendChild(tr);
+  tr.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',calculateAll));
+  calculateAll();
+}
+
+function calculateAll(){
+  let trSum=0, bbSum=0, cbSum=0;
+
+  document.querySelectorAll('#transformerRows tr').forEach(row=>{
+    const x=TRANSFORMERS[+row.querySelector('.tr-type').value];
+    const qty=parseFloat(row.querySelector('.tr-qty').value)||0;
+    const load=(parseFloat(row.querySelector('.tr-load').value)||0)/100;
+    const total=qty*(x.empty+x.full*Math.pow(load,2));
+    row.querySelector('.tr-empty').value=br(x.empty);
+    row.querySelector('.tr-full').value=br(x.full);
+    row.querySelector('.tr-total').value=br(total);
+    trSum+=total;
+  });
+
+  document.querySelectorAll('#busbarRows tr').forEach(row=>{
+    const x=BUSBARS[+row.querySelector('.bb-type').value];
+    const qty=parseFloat(row.querySelector('.bb-qty').value)||0;
+    const L=parseFloat(row.querySelector('.bb-length').value)||0;
+    const I=parseFloat(row.querySelector('.bb-current').value)||0;
+    const area=x.width*x.thickness*1e-6;
+    const total=area>0 ? qty*x.rho*L*I*I/area : 0;
+    row.querySelector('.bb-width').value=br(x.width,0);
+    row.querySelector('.bb-thick').value=br(x.thickness,0);
+    row.querySelector('.bb-rho').value=x.rho.toExponential(3);
+    row.querySelector('.bb-total').value=br(total);
+    bbSum+=total;
+  });
+
+  document.querySelectorAll('#cableRows tr').forEach(row=>{
+    const x=CABLES[+row.querySelector('.cb-type').value];
+    const qty=parseFloat(row.querySelector('.cb-qty').value)||0;
+    const L=parseFloat(row.querySelector('.cb-length').value)||0;
+    const I=parseFloat(row.querySelector('.cb-current').value)||0;
+    const areaMm2=Math.PI*x.diameter*x.diameter/4;
+    const total=areaMm2>0 ? qty*x.rho*L*I*I/(areaMm2*1e-6) : 0;
+    row.querySelector('.cb-dia').value=br(x.diameter,2);
+    row.querySelector('.cb-area').value=br(areaMm2,2);
+    row.querySelector('.cb-rho').value=x.rho.toExponential(3);
+    row.querySelector('.cb-total').value=br(total);
+    cbSum+=total;
+  });
+
+  const total=trSum+bbSum+cbSum;
+  const safe=total*num('safety');
+  const dt=num('tInt')-num('tExt');
+  const denom=num('airDensity')*num('airCp')*dt;
+  const airflow=denom>0 ? safe*3600/denom : 0;
+  const areaFree=num('faceVelocity')>0 ? (airflow/3600)/num('faceVelocity') : 0;
+  const areaGeom=num('freeArea')>0 ? areaFree/num('freeArea') : 0;
+
+  document.getElementById('transformerSubtotal').textContent=br(trSum)+' W';
+  document.getElementById('busbarSubtotal').textContent=br(bbSum)+' W';
+  document.getElementById('cableSubtotal').textContent=br(cbSum)+' W';
+  document.getElementById('totalW').textContent=br(total)+' W';
+  document.getElementById('totalBtu').textContent=br(total*3.412141633)+' BTU/h';
+  document.getElementById('safeW').textContent=br(safe)+' W';
+  document.getElementById('safeBtu').textContent=br(safe*3.412141633)+' BTU/h';
+  document.getElementById('airflowM3h').textContent=br(airflow)+' m³/h';
+  document.getElementById('airflowLs').textContent=br(airflow/3.6)+' L/s';
+  document.getElementById('freeAreaResult').textContent=br(areaFree,4)+' m²';
+  document.getElementById('grilleArea').textContent=br(areaGeom,4)+' m²';
+
+  const warning=document.getElementById('warningBox');
+  warning.style.display=dt>0?'none':'block';
+}
+
+function gatherRows(selector, mapping){
+  return [...document.querySelectorAll(selector)].map(row=>{
+    const out={};
+    for(const [key,sel] of Object.entries(mapping)){
+      const el=row.querySelector(sel);
+      out[key]=el.tagName==='SELECT' ? (sel.includes('type') ? (selector.includes('transformer')?TRANSFORMERS[+el.value].name:selector.includes('busbar')?BUSBARS[+el.value].name:CABLES[+el.value].name) : el.value) : el.value;
+    }
+    return out;
+  });
+}
+function saveProject(){
+  const data={
+    params:{tExt:num('tExt'),tInt:num('tInt'),safety:num('safety'),airDensity:num('airDensity'),airCp:num('airCp'),faceVelocity:num('faceVelocity'),freeArea:num('freeArea')},
+    transformers:gatherRows('#transformerRows tr',{name:'.tr-type',location:'.tr-location',qty:'.tr-qty',load:'.tr-load',note:'.tr-note'}),
+    busbars:gatherRows('#busbarRows tr',{name:'.bb-type',qty:'.bb-qty',length:'.bb-length',current:'.bb-current',note:'.bb-note'}),
+    cables:gatherRows('#cableRows tr',{name:'.cb-type',qty:'.cb-qty',length:'.cb-length',current:'.cb-current',note:'.cb-note'})
+  };
+  localStorage.setItem('substationVentilationProject',JSON.stringify(data));
+  alert('Dados salvos neste navegador.');
+}
+function loadProject(){
+  const raw=localStorage.getItem('substationVentilationProject');
+  if(!raw) return false;
+  try{
+    const d=JSON.parse(raw), p=d.params||{};
+    Object.keys(p).forEach(k=>{const el=document.getElementById(k); if(el) el.value=p[k]});
+    document.getElementById('transformerRows').innerHTML='';
+    document.getElementById('busbarRows').innerHTML='';
+    document.getElementById('cableRows').innerHTML='';
+    (d.transformers||[]).forEach(addTransformer);
+    (d.busbars||[]).forEach(addBusbar);
+    (d.cables||[]).forEach(addCable);
+    return true;
+  }catch(e){return false}
+}
+function resetProject(){
+  if(!confirm('Deseja limpar todos os dados e voltar ao exemplo inicial?')) return;
+  localStorage.removeItem('substationVentilationProject');
+  location.reload();
+}
+
+['tExt','tInt','safety','airDensity','airCp','faceVelocity','freeArea'].forEach(id=>document.getElementById(id).addEventListener('input',calculateAll));
+if(!loadProject()){
+  addTransformer();
+  addBusbar();
+  addCable();
+}
+calculateAll();
+</script>
+</body>
+</html>

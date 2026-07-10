@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Em Desenvolvimento</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+:root{
+--primary:#0f4fbf;--dark:#0b2d75;--bg:#f4f7fb;--card:#fff;
+--text:#172033;--muted:#607086;--border:#d8dee9;
+}
+body{background:var(--bg);color:var(--text)}
+.app-nav{position:sticky;top:0;z-index:999;background:linear-gradient(135deg,var(--primary),var(--dark));box-shadow:0 8px 24px rgba(15,23,42,.16)}
+.app-nav-inner{max-width:1300px;margin:auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:14px}
+.brand{color:#fff;text-decoration:none;font-size:18px;font-weight:800}
+.nav-links{display:flex;gap:8px;flex-wrap:wrap}
+.nav-links a{color:#eaf1ff;text-decoration:none;font-weight:700;font-size:13px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
+.nav-links a:hover,.nav-links a.active{background:#fff;color:var(--dark)}
+.container{max-width:1300px;margin:35px auto;padding:0 16px}
+.card{
+background:var(--card);
+border:1px solid var(--border);
+border-radius:18px;
+box-shadow:0 8px 22px rgba(15,23,42,.06);
+padding:70px 30px;
+text-align:center;
+}
+.icon{font-size:72px;margin-bottom:20px}
+h1{font-size:40px;color:var(--dark);margin-bottom:15px}
+p{font-size:18px;color:var(--muted);max-width:700px;margin:auto;line-height:1.7}
+.progress{
+margin:40px auto 20px;
+width:320px;
+height:12px;
+background:#dbe5f2;
+border-radius:999px;
+overflow:hidden;
+}
+.progress span{
+display:block;
+height:100%;
+width:35%;
+background:linear-gradient(90deg,#0f4fbf,#4b8dff);
+animation:move 2s ease-in-out infinite alternate;
+}
+@keyframes move{
+from{width:25%}
+to{width:70%}
+}
+.btn{
+display:inline-block;
+margin-top:35px;
+padding:12px 26px;
+border-radius:12px;
+background:#0f4fbf;
+color:#fff;
+text-decoration:none;
+font-weight:bold;
+}
+.btn:hover{filter:brightness(.95)}
+footer{
+margin-top:30px;
+font-size:13px;
+color:#7b8794;
+}
+@media(max-width:700px){
+.app-nav-inner{flex-direction:column;align-items:flex-start}
+h1{font-size:30px}
+p{font-size:16px}
+.progress{width:100%}
+}
+</style>
+</head>
+<body>
+
+<nav class="app-nav">
+  <div class="app-nav-inner">
+    <a class="brand" href="home.html">Seletores AVAC</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="Difusor_Quadrado.html">Difusor Quadrado</a>
+      <a href="Grelhas.html">Grelhas</a>
+      <a href="Sala_de_Cirurgia.html">Sala de Cirurgia</a>
+      <a href="Arquitetura.html">Arquitetura</a>
+      <a href="ventilacao_subestacao.html">Ventilação de Subestação</a>
+      <a href="Diesel.html">Diesel</a>
+      <a href="Exaustao_Cozinha.html">Exaustão de Cozinha</a>
+      <a href="GLP e GN.html">GLP e GN</a>
+      <a href="Linha de Vida.html">Linha de Vida</a>
+      <a href="Plano_Higgs.html">Plano de Rigging</a>
+      <a href="Pressurizacao.html">Pressurização Escada</a>
+
+    </div>
+</div>
+</nav>
+
+<div class="container">
+<div class="card">
+<div class="icon">🚧</div>
+<h1>Em Desenvolvimento</h1>
+
+<p>
+Esta ferramenta está sendo desenvolvida e em breve estará disponível
+com todos os recursos integrados ao conjunto de Seletores AVAC.
+</p>
+
+<div class="progress">
+<span></span>
+</div>
+
+<a class="btn" href="index.html">Voltar para a página inicial</a>
+
+<footer>
+Versão em desenvolvimento • Triarck Engenharia
+</footer>
+
+</div>
+</div>
+
+</body>
+</html>
