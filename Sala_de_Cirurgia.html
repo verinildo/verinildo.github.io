@@ -99,7 +99,7 @@
 </div><div class="best" id="resumoBest"></div></div>
 <div class="tabs"><button class="tab active" onclick="mostrar('linear')">Cortina linear</button><button class="tab" onclick="mostrar('uni')">Unidirecional</button><button class="tab" onclick="mostrar('ret')">Retorno</button><button class="tab" onclick="mostrar('rel')">Relatório</button></div>
 <div id="painel-linear" class="card painel"><div class="section-title"><h2>Cortina de ar — Difusores lineares</h2><span id="countLinear" class="status-line"></span></div><div id="bestLinear"></div><table><thead><tr><th>Selecionar</th><th>Módulo</th><th>C</th><th>L</th><th>Área</th><th>Vazão mín</th><th>Vazão máx</th><th>Entradas C</th><th>Entradas L</th><th>Status</th></tr></thead><tbody id="tblLinear"></tbody></table></div>
-<div id="painel-uni" class="card painel hide"><div class="section-title"><h2>Difusores unidirecionais</h2><span id="countUni" class="status-line"></span></div><div id="bestUni"></div><table><thead><tr><th>Selecionar</th><th>Difusor</th><th>Vazão sel.</th><th>Pt</th><th>NC</th><th>Alcance</th><th>NC?</th><th>Alcance?</th><th>Status</th></tr></thead><tbody id="tblUni"></tbody></table></div>
+<div id="painel-uni" class="card painel hide"><div class="section-title"><h2>Difusores unidirecionais</h2><span id="countUni" class="status-line"></span></div><div id="bestUni"></div><table><thead><tr><th>Selecionar</th><th>Difusor</th><th>Vazão sel.</th><th>Pt</th><th>NC</th><th>Alcance</th><th>Vazão?</th><th>NC?</th><th>Alcance?</th><th>Status</th></tr></thead><tbody id="tblUni"></tbody></table></div>
 <div id="painel-ret" class="card painel hide"><h2>Grelhas de retorno</h2><div class="best-grid" id="bestRet"></div><h3>Opções inferiores — 75%</h3><table><thead><tr><th>Selecionar</th><th>Vazão</th><th>∆p</th><th>dB(A)</th><th>Opções de grelha</th><th>Status</th></tr></thead><tbody id="tblRetBaixo"></tbody></table><h3>Opções superiores — 25%</h3><table><thead><tr><th>Selecionar</th><th>Vazão</th><th>∆p</th><th>dB(A)</th><th>Opções de grelha</th><th>Status</th></tr></thead><tbody id="tblRetAlto"></tbody></table></div>
 <div id="painel-rel" class="card painel hide"><h2>Relatório técnico resumido</h2><table><tbody id="tblRel"></tbody></table></div>
 </section>
@@ -183,16 +183,43 @@ function selecionarLinear(b){
  return DATA.linear.map(o=>{const atendeV=b.qCortina>=o.qmin&&b.qCortina<=o.qmax;const atendeA=b.area<=o.area;const ok=atendeV&&atendeA;const score=(ok?0:100000)+Math.abs(((o.qmin+o.qmax)/2)-b.qCortina)+Math.max(0,b.area-o.area)*1000;return {...o,atendeV,atendeA,ok,score}}).sort((a,b)=>a.score-b.score);
 }
 function alcanceUni(o,vel){return vel==0.25?o.a025:vel==0.38?o.a038:o.a050}
-function selecionarUni(b){
- const vel=Number(get('velTerm').value), ncMax=inputNum('ncUni');
+function selecionarUni(base){
+ const vel=Number(get('velTerm').value);
+ const ncMax=inputNum('ncUni');
  const grupos=[...new Set(DATA.uni.map(x=>x.size))];
+
  return grupos.map(size=>{
-   const rows=DATA.uni.filter(x=>x.size===size).filter(x=>x.q>=b.qPorUni).sort((a,b)=>a.q-b.q);
-   const sel=rows[0]||DATA.uni.filter(x=>x.size===size).sort((a,b)=>Math.abs(a.q-b.qPorUni)-Math.abs(b.q-b.qPorUni))[0];
-   const alc=alcanceUni(sel,vel); const atendeNC=sel.nc<=ncMax; const atendeAlc=alc!==null&&alc>b.alcanceReq; const ok=atendeNC&&atendeAlc&&sel.q>=b.qPorUni;
-   const score=(ok?0:100000)+Math.abs(sel.q-b.qPorUni)+sel.pt*10+sel.nc;
-   return {...sel,alc,atendeNC,atendeAlc,ok,score};
- }).sort((a,b)=>a.score-b.score);
+   // Todas as opções desse tamanho, em ordem crescente de vazão.
+   const opcoes=DATA.uni
+     .filter(x=>x.size===size)
+     .sort((a,b)=>a.q-b.q);
+
+   if(!opcoes.length) return null;
+
+   // Seleciona a menor vazão de catálogo que seja >= à vazão requerida.
+   // Se a vazão requerida estiver acima do catálogo, mantém a maior
+   // opção disponível apenas como referência e marca como NÃO ATENDE.
+   const sel=opcoes.find(x=>x.q>=base.qPorUni) || opcoes[opcoes.length-1];
+
+   const alc=alcanceUni(sel,vel);
+   const ncValor=Number(sel.nc);
+
+   const atendeVazao=sel.q>=base.qPorUni;
+   const atendeNC=Number.isFinite(ncValor) && ncValor<=ncMax;
+   const atendeAlc=alc!==null && alc>=base.alcanceReq;
+   const ok=atendeVazao && atendeNC && atendeAlc;
+
+   // Opções que atendem vêm primeiro. Depois, prioriza proximidade
+   // da vazão requerida, menor perda de pressão e menor NC.
+   const penalidadeVazao=atendeVazao ? 0 : 50000;
+   const score=(ok?0:100000)
+     +penalidadeVazao
+     +Math.abs(sel.q-base.qPorUni)
+     +(Number(sel.pt)||0)*10
+     +(Number.isFinite(ncValor)?ncValor:1000);
+
+   return {...sel,alc,atendeVazao,atendeNC,atendeAlc,ok,score};
+ }).filter(Boolean).sort((a,b)=>a.score-b.score);
 }
 function selecionarGrelhas(arr,q,dpMax,dbMax){
  return arr.map(o=>{const ok=o.q>=q&&o.dp<dpMax&&o.db<dbMax;const score=(ok?0:100000)+Math.abs(o.q-q)+(o.dp||0)*10+(o.db||0);return {...o,ok,score}}).sort((a,b)=>a.score-b.score);
@@ -212,11 +239,13 @@ function selecionarOpcao(tipo,i){
 }
 function selecionado(tipo){
  const lista={lin:STATE.lin,uni:STATE.uni,retB:STATE.retB,retA:STATE.retA}[tipo]||[];
- return lista[STATE.sel[tipo]]||lista[0];
+ const i=STATE.sel[tipo];
+ return Number.isInteger(i) && i>=0 && lista[i] ? lista[i] : null;
 }
 function melhorIndiceQueAtende(lista){
- const i=lista.findIndex(x=>x.ok);
- return i>=0?i:0;
+ // Retorna -1 quando nenhuma opção atende.
+ // Assim o sistema não força a primeira opção da tabela como se estivesse selecionada.
+ return lista.findIndex(x=>x.ok);
 }
 function calcular(){
  const b=calcBase();
@@ -254,7 +283,7 @@ function atualizarRelatorioImpressao(){
  setTxt('impLinearVazao',bestL ? fmt(bestL.qmin,0)+' a '+fmt(bestL.qmax,0)+' m³/h' : '-');
  setTxt('impUniAdotado',bestU ? bestU.size+' mm' : '-');
  setTxt('impQtdUni',fmt(inputNum('qtdUni'),0)+' un.');
- setTxt('impQPorUni',fmt(b.qPorUni,0)+' m³/h por difusor');
+ setTxt('impQPorUni',fmt(b.qPorUni,0)+' m³/h por difusor'+(bestU?'':' — NENHUMA OPÇÃO ATENDE'));
  setTxt('impUniDados',bestU ? 'Pt '+fmt(bestU.pt,2)+' mmCA | NC '+bestU.nc+' | Alcance '+fmt(bestU.alc,2)+' m' : '-');
  setTxt('impRetBaixo',bestB&&bestB.sizes ? bestB.sizes[0]+' | '+fmt(bestB.q,0)+' m³/h | ∆p '+fmt(bestB.dp,2)+' mmCA | '+fmt(bestB.db,0)+' dB(A)' : '-');
  setTxt('impRetAlto',bestA&&bestA.sizes ? bestA.sizes[0]+' | '+fmt(bestA.q,0)+' m³/h | ∆p '+fmt(bestA.dp,2)+' mmCA | '+fmt(bestA.db,0)+' dB(A)' : '-');
@@ -271,12 +300,23 @@ function renderizar(){
  const b=STATE.base, lin=STATE.lin, uni=STATE.uni, retB=STATE.retB, retA=STATE.retA;
  const bestL=selecionado('lin'), bestU=selecionado('uni'), bestB=selecionado('retB'), bestA=selecionado('retA');
  get('kVazao').textContent=fmt(b.vazao,0)+' m³/h'; get('kCortina').textContent=fmt(b.qCortina,0)+' m³/h'; get('kUni').textContent=fmt(b.qUni,0)+' m³/h'; get('kArea').textContent=fmt(b.area,2)+' m²';
- get('resumoBest').innerHTML=`<h3>Resumo da seleção</h3><div class="best-grid"><div><b>Cortina linear</b><br>${bestL?bestL.C+' x '+bestL.L+' mm':'-' }<br><span class="muted-select">Escolha atual</span></div><div><b>Unidirecional</b><br>${bestU?bestU.size:'-' } — ${fmt(b.qPorUni,0)} m³/h/dif.<br><span class="muted-select">Escolha atual</span></div><div><b>Retorno</b><br>Inf.: ${bestB&&bestB.sizes?bestB.sizes[0]:'-'} | Sup.: ${bestA&&bestA.sizes?bestA.sizes[0]:'-'}<br><span class="mini">${b.ramais} ramais</span></div></div>`;
+ const maxVazaoUni=Math.max(...DATA.uni.map(x=>Number(x.q)||0));
+ const qtdMinVazao=Math.ceil(b.qUni/maxVazaoUni);
+ const resumoUni=bestU
+   ? `${bestU.size} — ${fmt(bestU.q,0)} m³/h/dif.<br><span class="muted-select">Escolha atual</span>`
+   : `<span class="bad"><b>Nenhuma opção atende</b></span><br>Requerido: ${fmt(b.qPorUni,0)} m³/h/dif.<br><span class="mini">Máx. catálogo: ${fmt(maxVazaoUni,0)} m³/h/dif. | mínimo por vazão: ${qtdMinVazao} difusores</span>`;
+ get('resumoBest').innerHTML=`<h3>Resumo da seleção</h3><div class="best-grid"><div><b>Cortina linear</b><br>${bestL?bestL.C+' x '+bestL.L+' mm':'-' }<br><span class="muted-select">Escolha atual</span></div><div><b>Unidirecional</b><br>${resumoUni}</div><div><b>Retorno</b><br>Inf.: ${bestB&&bestB.sizes?bestB.sizes[0]:'-'} | Sup.: ${bestA&&bestA.sizes?bestA.sizes[0]:'-'}<br><span class="mini">${b.ramais} ramais</span></div></div>`;
  get('countLinear').innerHTML=`${lin.filter(x=>x.ok).length} opções atendem`; get('countUni').innerHTML=`${uni.filter(x=>x.ok).length} opções atendem`;
  get('bestLinear').innerHTML=bestL?`<div class="best"><b>Opção escolhida:</b> ICLF-2 — ${bestL.C} x ${bestL.L} mm | área ${fmt(bestL.area,2)} m² | vazão ${fmt(bestL.qmin,0)} a ${fmt(bestL.qmax,0)} m³/h | ${bestL.ok?badge('ATENDE',true):badge('VERIFICAR',false)}<div class="select-help">Clique em “Selecionar” na tabela para trocar por outra opção que atende.</div></div>`:'';
  linhas('tblLinear',lin.map((o,i)=>`<tr class="${STATE.sel.lin===i?'tr-selected':''}"><td>${acaoSelecionar('lin',i,o.ok)}</td><td>${o.mod}</td><td>${o.C}</td><td>${o.L}</td><td>${fmt(o.area,2)}</td><td>${fmt(o.qmin,0)}</td><td>${fmt(o.qmax,0)}</td><td>${o.entC}</td><td>${o.entL}</td><td>${o.ok?simNao(1):simNao(0)}</td></tr>`).join(''));
- get('bestUni').innerHTML=bestU?`<div class="best"><b>Opção escolhida:</b> ${bestU.size} | seleção ${fmt(bestU.q,0)} m³/h | Pt ${fmt(bestU.pt,2)} mmCA | NC ${bestU.nc} | alcance ${fmt(bestU.alc,2)} m | ${bestU.ok?badge('ATENDE',true):badge('VERIFICAR',false)}<div class="select-help">Clique em “Selecionar” na tabela para trocar por outro difusor que atende.</div></div>`:'';
- linhas('tblUni',uni.map((o,i)=>`<tr class="${STATE.sel.uni===i?'tr-selected':''}"><td>${acaoSelecionar('uni',i,o.ok)}</td><td>${o.size}</td><td>${fmt(o.q,0)}</td><td>${fmt(o.pt,2)}</td><td>${o.nc}</td><td>${fmt(o.alc,2)}</td><td>${simNao(o.atendeNC)}</td><td>${simNao(o.atendeAlc)}</td><td>${o.ok?simNao(1):simNao(0)}</td></tr>`).join(''));
+ if(bestU){
+   get('bestUni').innerHTML=`<div class="best"><b>Opção escolhida:</b> ${bestU.size} | seleção ${fmt(bestU.q,0)} m³/h | Pt ${fmt(bestU.pt,2)} mmCA | NC ${bestU.nc} | alcance ${fmt(bestU.alc,2)} m | ${badge('ATENDE',true)}<div class="select-help">Clique em “Selecionar” na tabela para trocar por outro difusor que atende.</div></div>`;
+ }else{
+   const maxQ=Math.max(...DATA.uni.map(x=>Number(x.q)||0));
+   const qtdMin=Math.ceil(b.qUni/maxQ);
+   get('bestUni').innerHTML=`<div class="note"><b>Nenhuma opção atende aos critérios atuais.</b><br>Vazão requerida por difusor: <b>${fmt(b.qPorUni,0)} m³/h</b>.<br>Maior vazão disponível no catálogo: <b>${fmt(maxQ,0)} m³/h</b>.<br>Com ${fmt(b.qUni,0)} m³/h destinados aos unidirecionais, são necessários pelo menos <b>${qtdMin} difusores</b> apenas pelo critério de vazão. Depois, NC e alcance também devem ser verificados.</div>`;
+ }
+ linhas('tblUni',uni.map((o,i)=>`<tr class="${STATE.sel.uni===i?'tr-selected':''}"><td>${acaoSelecionar('uni',i,o.ok)}</td><td>${o.size}</td><td>${fmt(o.q,0)}</td><td>${fmt(o.pt,2)}</td><td>${o.nc}</td><td>${fmt(o.alc,2)}</td><td>${simNao(o.atendeVazao)}</td><td>${simNao(o.atendeNC)}</td><td>${simNao(o.atendeAlc)}</td><td>${o.ok?simNao(1):simNao(0)}</td></tr>`).join(''));
  get('bestRet').innerHTML=`<div><b>Inferiores 75%</b><br>Vazão por grelha: ${fmt(b.retBaixoG,0)} m³/h<br>Selecionada: ${bestB&&bestB.sizes?bestB.sizes.join(' / '):'-'}<br>∆p ${fmt(bestB?bestB.dp:0,2)} | dB ${fmt(bestB?bestB.db:0,0)}</div><div><b>Superiores 25%</b><br>Vazão por grelha: ${fmt(b.retAltoG,0)} m³/h<br>Selecionada: ${bestA&&bestA.sizes?bestA.sizes.join(' / '):'-'}<br>∆p ${fmt(bestA?bestA.dp:0,2)} | dB ${fmt(bestA?bestA.db:0,0)}</div><div><b>Retorno total efetivo</b><br>${fmt(b.retTotal,0)} m³/h<br><span class="mini">Após pressurização de ${fmt(inputNum('percPress'),0)}%</span></div>`;
  linhas('tblRetBaixo',retB.slice(0,20).map((o,i)=>`<tr class="${STATE.sel.retB===i?'tr-selected':''}"><td>${acaoSelecionar('retB',i,o.ok)}</td><td>${fmt(o.q,0)}</td><td>${fmt(o.dp,2)}</td><td>${fmt(o.db,0)}</td><td>${o.sizes.join(' / ')}</td><td>${o.ok?simNao(1):simNao(0)}</td></tr>`).join(''));
  linhas('tblRetAlto',retA.slice(0,20).map((o,i)=>`<tr class="${STATE.sel.retA===i?'tr-selected':''}"><td>${acaoSelecionar('retA',i,o.ok)}</td><td>${fmt(o.q,0)}</td><td>${fmt(o.dp,2)}</td><td>${fmt(o.db,0)}</td><td>${o.sizes.join(' / ')}</td><td>${o.ok?simNao(1):simNao(0)}</td></tr>`).join(''));
