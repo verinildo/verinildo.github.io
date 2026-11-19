@@ -1,122 +1,189 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Em Desenvolvimento</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cálculo de Pressurização de Escadas</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-:root{
---primary:#0f4fbf;--dark:#0b2d75;--bg:#f4f7fb;--card:#fff;
---text:#172033;--muted:#607086;--border:#d8dee9;
-}
-body{background:var(--bg);color:var(--text)}
-.app-nav{position:sticky;top:0;z-index:999;background:linear-gradient(135deg,var(--primary),var(--dark));box-shadow:0 8px 24px rgba(15,23,42,.16)}
-.app-nav-inner{max-width:1300px;margin:auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:14px}
-.brand{color:#fff;text-decoration:none;font-size:18px;font-weight:800}
-.nav-links{display:flex;gap:8px;flex-wrap:wrap}
-.nav-links a{color:#eaf1ff;text-decoration:none;font-weight:700;font-size:13px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
-.nav-links a:hover,.nav-links a.active{background:#fff;color:var(--dark)}
-.container{max-width:1300px;margin:35px auto;padding:0 16px}
-.card{
-background:var(--card);
-border:1px solid var(--border);
-border-radius:18px;
-box-shadow:0 8px 22px rgba(15,23,42,.06);
-padding:70px 30px;
-text-align:center;
-}
-.icon{font-size:72px;margin-bottom:20px}
-h1{font-size:40px;color:var(--dark);margin-bottom:15px}
-p{font-size:18px;color:var(--muted);max-width:700px;margin:auto;line-height:1.7}
-.progress{
-margin:40px auto 20px;
-width:320px;
-height:12px;
-background:#dbe5f2;
-border-radius:999px;
-overflow:hidden;
-}
-.progress span{
-display:block;
-height:100%;
-width:35%;
-background:linear-gradient(90deg,#0f4fbf,#4b8dff);
-animation:move 2s ease-in-out infinite alternate;
-}
-@keyframes move{
-from{width:25%}
-to{width:70%}
-}
-.btn{
-display:inline-block;
-margin-top:35px;
-padding:12px 26px;
-border-radius:12px;
-background:#0f4fbf;
-color:#fff;
-text-decoration:none;
-font-weight:bold;
-}
-.btn:hover{filter:brightness(.95)}
-footer{
-margin-top:30px;
-font-size:13px;
-color:#7b8794;
-}
-@media(max-width:700px){
-.app-nav-inner{flex-direction:column;align-items:flex-start}
-h1{font-size:30px}
-p{font-size:16px}
-.progress{width:100%}
-}
+    :root{
+      --bg:#eef3f8; --card:#ffffff; --ink:#142033; --muted:#607086;
+      --brand:#0f5e9c; --brand2:#0b789f; --line:#d6e0ea; --ok:#198754; --warn:#b7791f; --bad:#b42318;
+      --soft:#f6f9fc;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}
+    header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:white;padding:24px 28px;box-shadow:0 2px 12px #0002}
+    header h1{margin:0;font-size:24px;letter-spacing:.2px}.subtitle{margin-top:6px;opacity:.92;font-size:14px}
+    .wrap{max-width:1220px;margin:0 auto;padding:18px}
+    nav{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
+    nav button{border:1px solid var(--line);background:white;color:var(--brand);padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 1px 4px #0001}
+    nav button.active{background:var(--brand);color:white;border-color:var(--brand)}
+    section.tab{display:none}.tab.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{grid-column:span 12;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 6px 18px #14375a12}.half{grid-column:span 6}.third{grid-column:span 4}.two{grid-column:span 8}
+    @media(max-width:900px){.half,.third,.two{grid-column:span 12}}
+    h2{margin:0 0 14px;font-size:20px;color:var(--brand)}h3{margin:6px 0 12px;font-size:16px;color:#22364d}.note{color:var(--muted);font-size:13px;line-height:1.4}.row{display:grid;grid-template-columns:1fr 170px 70px;gap:10px;align-items:center;margin:9px 0}.row.long{grid-template-columns:1fr}.row label{font-size:14px;color:#25384f}.row input,.row select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:white;color:var(--ink);font-size:14px}textarea{min-height:70px;resize:vertical}.unit{color:var(--muted);font-size:13px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.kpi{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px}.kpi span{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.kpi strong{font-size:21px;color:#0d3d66}.ok{color:var(--ok)!important}.bad{color:var(--bad)!important}.warn{color:var(--warn)!important}
+    table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{border:1px solid var(--line);padding:8px 9px;text-align:left;font-size:13px}th{background:#e8f1f8;color:#163a5b}td.num{text-align:right;font-variant-numeric:tabular-nums}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}button.primary{background:var(--brand);color:white;border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}.ghost{background:white;color:var(--brand);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}.small{font-size:12px;color:var(--muted)}.formula{font-family:Consolas,monospace;background:#f8fafc;border-left:4px solid var(--brand);padding:10px;border-radius:8px;color:#24364a}.print-only{display:none}
+    @media print{body{background:white}header,nav,.actions,.no-print{display:none!important}.wrap{max-width:none;padding:0}.tab{display:block!important;break-inside:avoid}.card{box-shadow:none;border:1px solid #bbb;margin-bottom:10px}.print-only{display:block}.row input,.row select,textarea{border:0;padding:0}.tab:not(#relatorio){display:none!important}}
+  
+/* Identidade visual compartilhada — Seletores AVAC / Grelhas */
+:root{--bg:#f4f7fb;--card:#fff;--ink:#172033;--muted:#607086;--brand:#0f4fbf;--brand2:#0b2d75;--line:#d8dee9;--ok:#15803d;--warn:#b45309;--bad:#b91c1c;--soft:#eef3ff;}
+body{background:var(--bg);color:var(--ink)}
+.app-nav{position:sticky;top:0;z-index:999;background:linear-gradient(135deg,#0f4fbf,#0b2d75);color:#fff;box-shadow:0 8px 24px rgba(15,23,42,.16)}
+.app-nav-inner{max-width:1300px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.app-nav .brand{color:#fff;text-decoration:none;font-weight:800;letter-spacing:.2px;font-size:18px;white-space:nowrap}
+.app-nav .nav-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.app-nav .nav-links a{color:#eaf1ff;text-decoration:none;font-weight:700;font-size:13px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
+.app-nav .nav-links a:hover,.app-nav .nav-links a.active{background:#fff;color:#0b2d75}
+header{background:linear-gradient(135deg,#0f4fbf,#0b2d75);padding:24px 18px;box-shadow:none}
+header h1{font-size:28px;margin:0 0 6px}header .subtitle{margin:0;opacity:.92}
+.wrap{max-width:1220px;margin:22px auto;padding:0 16px 36px}
+.wrap>nav.no-print{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.wrap>nav.no-print button{border:1px solid var(--line);background:#fff;color:#0b2d75;border-radius:999px;padding:10px 14px;font-weight:700;box-shadow:0 3px 10px rgba(15,23,42,.04)}
+.wrap>nav.no-print button:hover{background:#eef3ff}
+.wrap>nav.no-print button.active{background:#0f4fbf;color:#fff;border-color:#0f4fbf}
+.card{background:#fff;border:1px solid #d8dee9;border-radius:16px;padding:16px;box-shadow:0 8px 22px rgba(15,23,42,.06)}
+h2{color:#0b2d75}h3{color:#0b2d75}
+.row label{color:#172033;font-weight:700}
+.row input,.row select,textarea{border:1px solid #d8dee9;border-radius:10px;padding:10px 11px;background:#fff;color:#172033;font-size:14px}
+.row input:focus,.row select:focus,textarea:focus{outline:2px solid rgba(15,79,191,.22);border-color:#0f4fbf}
+.kpi{background:#f8fafc;border:1px solid #d8dee9;border-radius:14px;padding:12px}
+.kpi strong{color:#172033;font-size:20px}
+table{border-collapse:collapse;background:#fff}th,td{border-color:#d8dee9}th{background:#eef3ff;color:#0b2d75}
+button.primary{background:#0f4fbf;color:#fff;border:0;border-radius:12px;padding:12px 14px}
+.ghost{background:#475569;color:#fff;border:0;border-radius:12px;padding:12px 14px}
+button.primary:hover,.ghost:hover{filter:brightness(.95)}
+.formula{background:#f8fafc;border-left-color:#0f4fbf}
+.note{color:#607086}
+@media(max-width:760px){.app-nav-inner{align-items:flex-start;flex-direction:column}.app-nav .nav-links{justify-content:flex-start}.app-nav .nav-links a{font-size:12px;padding:7px 9px}.wrap{padding:0 12px 24px}.row:not(.long){grid-template-columns:minmax(0,1fr) 130px 48px;gap:7px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.card{overflow-x:auto}}
+@media(max-width:450px){.row:not(.long){grid-template-columns:1fr}.row:not(.long) .unit{margin-top:-4px}.kpis{grid-template-columns:1fr}header h1{font-size:24px}}
+@media print{.app-nav{display:none!important}body{background:#fff}.card{box-shadow:none}.wrap{max-width:none;margin:0;padding:0}header{display:none!important}}
+
+  
+/* Cabeçalho idêntico ao layout DieselCalc: faixa azul contida no painel central */
+.wrap{max-width:1300px;margin:0 auto;padding:0 22px 36px}
+header.press-header{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:0 0 18px;padding:24px 22px;border-radius:0 0 16px 16px;background:linear-gradient(135deg,#0f4fbf,#0b2d75);color:#fff;box-shadow:none}
+header.press-header .eyebrow{color:#dbeafe;letter-spacing:.12em;font-size:11px;font-weight:800;margin-bottom:7px}
+header.press-header h1{font-size:28px;line-height:1.2;margin:0 0 7px;color:#fff}
+header.press-header .subtitle{font-size:14px;line-height:1.55;color:#eaf1ff;margin:0;opacity:1}
+.wrap>nav.no-print{margin:0 0 18px;padding:0 0 8px;border-bottom:1px solid var(--line)}
+@media(max-width:760px){.wrap{padding:0 13px 24px}header.press-header{margin:0 -13px 16px;padding:20px 18px}header.press-header h1{font-size:24px}}
+@media print{header.press-header{display:none!important}.wrap{max-width:none;padding:0}}
 </style>
 </head>
 <body>
-
 <nav class="app-nav">
-  <div class="app-nav-inner">
-    <a class="brand" href="home.html">Seletores AVAC</a>
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="Difusor_Quadrado.html">Difusor Quadrado</a>
-      <a href="Grelhas.html">Grelhas</a>
-      <a href="Sala_de_Cirurgia.html">Sala de Cirurgia</a>
-      <a href="Arquitetura.html">Arquitetura</a>
-      <a href="ventilacao_subestacao.html">Ventilação de Subestação</a>
-      <a href="Diesel.html">Diesel</a>
-      <a href="Exaustao_Cozinha.html">Exaustão de Cozinha</a>
-      <a href="GLP e GN.html">GLP e GN</a>
-      <a href="Linha de Vida.html">Linha de Vida</a>
-      <a href="Plano_Higgs.html">Plano de Rigging</a>
-      <a href="Pressurizacao.html">Pressurização Escada</a>
-
-    </div>
+<div class="app-nav-inner">
+<a class="brand" href="home.html">Seletores AVAC</a>
+<div class="nav-links">
+<a href="index.html">Home</a>
+<a href="Difusor_Quadrado.html">Difusor Quadrado</a>
+<a href="Grelhas.html">Grelhas</a>
+<a href="Sala_de_Cirurgia.html">Sala de Cirurgia</a>
+<a href="Arquitetura.html">Arquitetura</a>
+<a href="ventilacao_subestacao.html">Ventilação de Subestação</a>
+<a href="Diesel.html">Diesel</a>
+<a href="Exaustao_Cozinha.html">Exaustão de Cozinha</a>
+<a href="GLP e GN.html">GLP e GN</a>
+<a href="Linha de Vida.html">Linha de Vida</a>
+<a href="Plano_Higgs.html">Plano de Rigging</a>
+<a aria-current="page" class="active" href="Pressurizacao.html">Pressurização Escada</a>
+</div>
 </div>
 </nav>
 
-<div class="container">
-<div class="card">
-<div class="icon">🚧</div>
-<h1>Em Desenvolvimento</h1>
-
-<p>
-Esta ferramenta está sendo desenvolvida e em breve estará disponível
-com todos os recursos integrados ao conjunto de Seletores AVAC.
-</p>
-
-<div class="progress">
-<span></span>
+<div class="wrap"><header class="top press-header"><div class="press-title"><div class="eyebrow">FERRAMENTA DE ENGENHARIA • PRESSURIZAÇÃO DE ESCADAS</div><h1>Cálculo de Sistema de Pressurização de Escadas</h1><p class="subtitle">Aplicação HTML + CSS + JavaScript baseada na planilha enviada</p></div></header>
+<nav class="no-print">
+<button class="active" data-tab="dados">Dados básicos</button><button data-tab="vazao">Vazão</button><button data-tab="dimensionamento">Dimensionamento</button><button data-tab="pressao">Perda de carga</button><button data-tab="selecao">Seleção</button><button data-tab="verificacao">Verificação</button><button data-tab="relatorio">Relatório</button>
+</nav>
+<section class="tab active" id="dados">
+<div class="grid">
+<div class="card two"><h2>Dados da edificação</h2>
+<div class="row long"><label>Endereço</label><textarea id="endereco">AV. GOV. AGAMENON MAGALHAES, S/N - DERBY, RECIFE,52171 - 001 - PE</textarea></div>
+<div class="row"><label>Descrição da obra</label><input id="descricao" value="Escada sul, bloco antigo"/><span></span></div>
+<div class="row"><label>Tipo de edificação / ocupação</label><select id="ocupacao"></select><span></span></div>
+<div class="row"><label>Altura total da edificação</label><input id="altura" step="0.01" type="number" value="50"/><span class="unit">m</span></div>
+<div class="row"><label>É edificação tipo convento?</label><select id="convento"><option>Não</option><option>Sim</option></select><span></span></div>
+<div class="row"><label>Nº de PCF por pavimento</label><input id="pcfPav" step="1" type="number" value="1"/><span class="unit">un</span></div>
+<div class="row"><label>Número de PCF de ingresso (NPI)</label><input id="npi" step="1" type="number" value="8"/><span class="unit">un</span></div>
+<div class="row"><label>Número de PCF de saída (NPS)</label><input id="nps" step="1" type="number" value="1"/><span class="unit">un</span></div>
+<div class="row"><label>Área do pavimento</label><input id="areaPav" step="0.01" type="number" value="1487"/><span class="unit">m²</span></div>
 </div>
-
-<a class="btn" href="index.html">Voltar para a página inicial</a>
-
-<footer>
-Versão em desenvolvimento • Triarck Engenharia
-</footer>
-
+<div class="card third"><h2>Portas e critérios</h2>
+<div class="row long"><label>Tipo de PCF de acesso</label><select id="portaAcesso"></select></div>
+<div class="row long"><label>Tipo de PCF de saída</label><select id="portaSaida"></select></div>
+<div class="row"><label>Diferencial de pressão desejado</label><input id="dp" step="1" type="number" value="50"/><span class="unit">Pa</span></div>
+<div class="row long"><label>Tipo de associação entre áreas de escape</label><select id="associacao"><option>Portas Paralelo (P)</option><option>Portas Série (S)</option><option selected="">Portas Mista (S+P)</option></select></div>
+<div class="row"><label>Nº de portas em série/paralelo</label><input id="numAssoc" step="1" type="number" value="1"/><span class="unit">un</span></div>
+</div>
+<div class="card third"><h2>Segurança e velocidades</h2>
+<div class="row long"><label>Tipo de duto</label><select id="tipoDuto"><option>Duto metálico</option><option>Duto em alvenaria</option></select></div>
+<div class="row"><label>Fator de vazamentos não identificados</label><input id="fsVaz" step="0.01" type="number" value="0.25"/><span class="unit">decimal</span></div>
+<div class="row"><label>Velocidade mínima na PCF aberta</label><input id="vpa" step="0.01" type="number" value="1"/><span class="unit">m/s</span></div>
+<div class="actions"><button class="primary" onclick="calcular()">Calcular</button><button class="ghost" onclick="window.print()">Imprimir relatório em PDF</button></div>
+<p class="note">Use “Imprimir relatório em PDF” para salvar o relatório como PDF pelo navegador.</p>
 </div>
 </div>
-
+</section>
+<section class="tab" id="vazao"><div class="grid"><div class="card"><h2>Resultados de vazão</h2><div class="kpis" id="kpisVazao"></div></div><div class="card half"><h3>Fórmulas principais</h3><div class="formula">QFT = 0,827 × A × √ΔP<br/>QAT = [(AVL × NPA) + (APF × NPF)] × VPA</div></div><div class="card half"><h3>Detalhamento</h3><table id="tblVazao"></table></div></div></section>
+<section class="tab" id="dimensionamento"><div class="grid"><div class="card half"><h2>Dimensionamento</h2>
+<div class="row"><label>Vazão adotada manual</label><input id="vazaoAdotada" step="1" type="number" value="34650"/><span class="unit">m³/h</span></div>
+<div class="row"><label>Velocidade adotada na captação</label><input id="velCaptacao" step="0.1" type="number" value="7"/><span class="unit">m/s</span></div>
+<div class="row"><label>Velocidade adotada na descarga</label><input id="velDescarga" step="0.1" type="number" value="10"/><span class="unit">m/s</span></div>
+<div class="row"><label>Duto adotado — largura W</label><input id="dutoW" step="0.01" type="number" value="0.7"/><span class="unit">m</span></div>
+<div class="row"><label>Duto adotado — altura H</label><input id="dutoH" step="0.01" type="number" value="1.4"/><span class="unit">m</span></div>
+<div class="row"><label>Nº de grelhas de insuflamento</label><input id="numGrelhas" step="1" type="number" value="9"/><span class="unit">un</span></div>
+<div class="row"><label>Vazão considerada por grelha</label><input id="vazaoGrelhaSel" step="1" type="number" value="4000"/><span class="unit">m³/h</span></div>
+<div class="row"><label>Vazão considerada para damper</label><input id="vazaoDamperSel" step="1" type="number" value="25000"/><span class="unit">m³/h</span></div>
+<div class="actions"><button class="primary" onclick="calcular()">Atualizar</button></div>
+</div><div class="card half"><h2>Resumo do dimensionamento</h2><div class="kpis" id="kpisDim"></div><table id="tblDim"></table></div></div></section>
+<section class="tab" id="pressao"><div class="grid"><div class="card"><h2>Trechos do duto de pressurização</h2><p class="note">Edite comprimentos, dimensões e coeficientes localizados. A vazão é distribuída por pavimento conforme a vazão por grelha.</p><table id="tblPressao"></table><div class="actions"><button class="ghost" onclick="addTrecho()">Adicionar trecho</button><button class="primary" onclick="calcular()">Recalcular perdas</button></div></div></div></section>
+<section class="tab" id="selecao"><div class="grid"><div class="card half"><h2>Perdas consideradas e ventilador</h2>
+<div class="row"><label>Veneziana + grade de proteção</label><input id="perdaVeneziana" step="0.1" type="number" value="48"/><span class="unit">Pa</span></div>
+<div class="row"><label>Filtro metálico de captação</label><input id="perdaFiltro" step="0.1" type="number" value="30"/><span class="unit">Pa</span></div>
+<div class="row"><label>Duto de admissão do ar</label><input id="perdaAdmissao" step="0.1" type="number" value="10"/><span class="unit">Pa</span></div>
+<div class="row"><label>Damper de sobrepressão</label><input id="perdaDamper" step="0.1" type="number" value="55"/><span class="unit">Pa</span></div>
+<div class="row"><label>Grelha de insuflamento</label><input id="perdaGrelha" step="0.1" type="number" value="64"/><span class="unit">Pa</span></div>
+<div class="row"><label>Pressão adotada do ventilador</label><input id="pressaoVent" step="1" type="number" value="520"/><span class="unit">Pa</span></div>
+<div class="row"><label>Potência do motor</label><input id="potencia" step="0.1" type="number" value="15"/><span class="unit">CV</span></div>
+<div class="row long"><label>Características</label><input id="caracMotor" value="4 Polos TRIFÁSICO 60Hz"/></div>
+<div class="actions"><button class="primary" onclick="calcular()">Atualizar seleção</button></div>
+</div><div class="card half"><h2>Resultado da seleção</h2><div class="kpis" id="kpisSel"></div><table id="tblSel"></table></div></div></section>
+<section class="tab" id="verificacao"><div class="grid"><div class="card half"><h2>Força para abrir a porta</h2><div class="kpis" id="kpisVer"></div><table id="tblVer"></table></div><div class="card half"><h2>Escape de ar pressurizado</h2><div class="row"><label>Porcentagem</label><input id="percEscape" step="0.1" type="number" value="15"/><span class="unit">%</span></div><div class="row"><label>Velocidade</label><input id="velEscape" step="0.1" type="number" value="1"/><span class="unit">m/s</span></div><div class="actions"><button class="primary" onclick="calcular()">Atualizar</button></div><table id="tblEscape"></table></div></div></section>
+<section class="tab" id="relatorio"><div class="grid"><div class="card"><h2>Relatório de cálculo</h2><div id="relatorioConteudo"></div><div class="actions no-print"><button class="primary" onclick="window.print()">Salvar / imprimir PDF</button></div></div></div></section>
+</div>
+<script>
+const portas={
+ 'PCF Simples, batente rebaixado dando ACESSO ao espaço pressurizado':{dim:'2,10 x 0,89',avl:1.64,apf:0.03},
+ 'PCF Simples, batente rebaixado permitindo a SAÍDA do espaço pressurizado':{dim:'2,10 x 0,89',avl:1.64,apf:0.04},
+ 'PCF Dupla com ou sem rebaixo central dando ACESSO':{dim:'2,10 x 0,89 (cada)',avl:3.28,apf:0.045},
+ 'PCF Dupla com ou sem rebaixo central permitindo SAÍDA':{dim:'2,10 x 0,89 (cada)',avl:3.28,apf:0.06}
+};
+const ocupacoes=['Residencial','Serviço de Hospedagem','Comercial','Serviço profissional','Educacional e cultura física','Local de Reunião de Público','Serviço automotivo','Serviço de saúde e institucional','Indústria','Depósito'];
+let trechos=[];
+function qs(id){return document.getElementById(id)} function n(id){return parseFloat(qs(id).value)||0} function fmt(x,d=2){return Number.isFinite(x)?x.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}):'-'}
+function init(){ocupacoes.forEach(o=>qs('ocupacao').add(new Option(o,o))); qs('ocupacao').value='Serviço de saúde e institucional'; Object.keys(portas).forEach(p=>{qs('portaAcesso').add(new Option(p,p));qs('portaSaida').add(new Option(p,p));}); qs('portaAcesso').value='PCF Dupla com ou sem rebaixo central dando ACESSO';qs('portaSaida').value='PCF Dupla com ou sem rebaixo central permitindo SAÍDA';
+ trechos=[{de:'Pav0',para:'Pav1',W:.8,H:1.4,L:12,C:1.92},{de:'-',para:'-',W:.7,H:1.4,L:5,C:1.1}]; for(let i=1;i<=8;i++)trechos.push({de:'Pav'+i,para:'Pav'+(i+1),W:.7,H:1.4,L:4.3,C:i===8?1.1:.3});
+ document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',calcular)); document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button,.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');qs(b.dataset.tab).classList.add('active')}); calcular();}
+function areaAssociacao(api,aps,npi,nps,tipo,num){ if(tipo.includes('Paralelo')) return api*npi+aps*nps; if(tipo.includes('Série')&&!tipo.includes('Mista')) return 1/(npi/api+nps/aps); let aSerie=1/(1/api+1/aps); return aSerie*Math.max(1,num); }
+function calcBase(){let acesso=portas[qs('portaAcesso').value], saida=portas[qs('portaSaida').value];let npi=n('npi'), nps=n('nps'), dp=n('dp'), vpa=n('vpa');let api=acesso.apf, aps=saida.apf, avl=acesso.avl;let A=areaAssociacao(api,aps,npi,nps,qs('associacao').value,n('numAssoc'));let npa=2*n('pcfPav');let npf=npi+nps-npa;let qft=0.827*A*Math.sqrt(dp);let qat=((avl*npa)+(api*npf))*vpa;let qConsiderada=Math.max(qft,qat);let qConsideradaH=qConsiderada*3600;let fsDuto=qs('tipoDuto').value.includes('alvenaria')?0.25:0.15;let fsTotal=1+fsDuto+n('fsVaz');let qFechadaH=qft*3600*fsTotal;let qAbertaH=qat*3600*fsTotal;let qAdotada=n('vazaoAdotada')||qAbertaH;return {acesso,saida,npi,nps,dp,vpa,api,aps,avl,A,npa,npf,qft,qat,qConsiderada,qConsideradaH,fsDuto,fsTotal,qFechadaH,qAbertaH,qAdotada};}
+function calcPressao(base){let vazPorGrelha=base.qAdotada/Math.max(1,n('numGrelhas'));let rows=[];let totalX=0,totalZ=0;trechos.forEach((t,i)=>{let Q=i<2?base.qAdotada:Math.max(0,base.qAdotada-vazPorGrelha*(i-1));let K=Q/3.6,A=t.W*t.H,V=K/1000/A,Pv=(1.204/2)*V*V,Dh=2*t.W*t.H/(t.W+t.H),Re=66.4*Dh*V*1000,E=.09,fl=0.11*Math.pow((E/(Dh*1000))+(68/Re),.25),f=fl>=.018?fl:(.85*fl)+.0028,Pfm=f*Pv/Dh,Pf=Pfm*t.L,Pl=Pv*t.C,Pt=Pf+Pl; totalX+=Pf; totalZ+=Pl; rows.push({...t,Q,K,A,V,Pv,Dh,Re,E,fl,f,Pfm,Pf,Pl,Pt});});return {rows,totalPf:totalX,totalPl:totalZ,total:totalX+totalZ};}
+function calcular(){let b=calcBase();let areaCapt=b.qAdotada/3600/n('velCaptacao'), areaDesc=b.qAdotada/3600/n('velDescarga'), vazGrelha=b.qAdotada/Math.max(1,n('numGrelhas')), vazExced=b.qAdotada-b.qFechadaH;let p=calcPressao(b);let perdasCap=n('perdaVeneziana')+n('perdaFiltro')+n('perdaAdmissao'), subtotal=perdasCap+n('perdaDamper')+n('perdaGrelha')+p.total+b.dp,total=subtotal*1.1,mmca=n('pressaoVent')/9.81;let saldo=n('pressaoVent')-p.total-n('perdaGrelha')-perdasCap-n('perdaDamper')-(p.total*.15);let forca=50+(1*.8*1.6*saldo)/(2*(.8-.15));let qEscape=n('percEscape')*b.avl*n('velEscape')/100;
+ renderKpis('kpisVazao',[['QFT portas fechadas',fmt(b.qft,3)+' m³/s'],['QAT portas abertas',fmt(b.qat,3)+' m³/s'],['Vazão calculada',fmt(b.qConsideradaH,0)+' m³/h'],['Vazão com FS',fmt(b.qAbertaH,0)+' m³/h']]);
+ table('tblVazao',[['Item','Valor','Unidade'],['Área total de escape A',fmt(b.A,4),'m²'],['AVL',fmt(b.avl,2),'m²'],['NPA',fmt(b.npa,0),'un'],['NPF',fmt(b.npf,0),'un'],['FS total',fmt(b.fsTotal,2),'-'],['Vazão adotada',fmt(b.qAdotada,0),'m³/h']]);
+ renderKpis('kpisDim',[['Área captação mínima',fmt(areaCapt,3)+' m²'],['Área descarga mínima',fmt(areaDesc,3)+' m²'],['Vazão por grelha',fmt(vazGrelha,0)+' m³/h'],['Vazão excedente',fmt(vazExced,0)+' m³/h']]);
+ table('tblDim',[['Item','Valor','Unidade'],['Duto adotado',fmt(n('dutoW'),2)+' x '+fmt(n('dutoH'),2),'m'],['Área adotada do duto',fmt(n('dutoW')*n('dutoH'),3),'m²'],['Grelha para seleção',fmt(n('vazaoGrelhaSel'),0),'m³/h'],['Damper para seleção',fmt(n('vazaoDamperSel'),0),'m³/h']]); renderPressao(p);
+ renderKpis('kpisSel',[['Perda no duto',fmt(p.total,2)+' Pa'],['Pressão necessária',fmt(total,2)+' Pa'],['Pressão adotada',fmt(n('pressaoVent'),0)+' Pa'],['Vazão necessária',fmt(b.qAdotada,0)+' m³/h']]);
+ table('tblSel',[['Item','Valor','Unidade'],['Subtotal de perdas',fmt(subtotal,2),'Pa'],['Margem 10%',fmt(subtotal*.1,2),'Pa'],['Total com margem',fmt(total,2),'Pa'],['Pressão adotada em mmCa',fmt(mmca,2),'mmCa'],['Potência',fmt(n('potencia'),1),'CV'],['Características',qs('caracMotor').value,'']]);
+ let status=forca<120?'Aceitável':'Verificar'; renderKpis('kpisVer',[['Saldo de pressão',fmt(saldo,2)+' Pa'],['Força de abertura',fmt(forca,2)+' N'],['Critério','F < 120 N'],['Status',status]]); qs('kpisVer').lastChild.querySelector('strong').className=forca<120?'ok':'bad';
+ table('tblVer',[['Item','Valor','Unidade'],['Pressão ventilador',fmt(n('pressaoVent'),2),'Pa'],['Perda rede dutos',fmt(p.total,2),'Pa'],['Perda captação',fmt(perdasCap,2),'Pa'],['Perda grelha',fmt(n('perdaGrelha'),2),'Pa'],['Perda damper',fmt(n('perdaDamper'),2),'Pa'],['Perdas não computadas',fmt(p.total*.15,2),'Pa']]);
+ table('tblEscape',[['Item','Valor','Unidade'],['Área da porta aberta',fmt(b.avl,2),'m²'],['Vazão de escape',fmt(qEscape,3),'m³/s'],['Vazão de escape',fmt(qEscape*1000,1),'L/s']]); renderRelatorio(b,p,{areaCapt,areaDesc,vazGrelha,vazExced,total,subtotal,forca,status,saldo,qEscape});}
+function renderKpis(id,arr){qs(id).innerHTML=arr.map(a=>`<div class="kpi"><span>${a[0]}</span><strong>${a[1]}</strong></div>`).join('')}
+function table(id,rows){qs(id).innerHTML=rows.map((r,i)=>`<tr>${r.map((c,j)=>i==0?`<th>${c}</th>`:`<td class="${j==1?'num':''}">${c}</td>`).join('')}</tr>`).join('')}
+function renderPressao(p){let html='<tr><th>De</th><th>Para</th><th>Q m³/h</th><th>W m</th><th>H m</th><th>L m</th><th>C</th><th>V m/s</th><th>Pf Pa</th><th>Pl Pa</th><th>Pt Pa</th><th></th></tr>';p.rows.forEach((r,i)=>{html+=`<tr><td><input value="${r.de}" onchange="trechos[${i}].de=this.value;calcular()"></td><td><input value="${r.para}" onchange="trechos[${i}].para=this.value;calcular()"></td><td class="num">${fmt(r.Q,0)}</td><td><input type="number" step="0.01" value="${r.W}" onchange="trechos[${i}].W=parseFloat(this.value)||0;calcular()"></td><td><input type="number" step="0.01" value="${r.H}" onchange="trechos[${i}].H=parseFloat(this.value)||0;calcular()"></td><td><input type="number" step="0.1" value="${r.L}" onchange="trechos[${i}].L=parseFloat(this.value)||0;calcular()"></td><td><input type="number" step="0.01" value="${r.C}" onchange="trechos[${i}].C=parseFloat(this.value)||0;calcular()"></td><td class="num">${fmt(r.V,2)}</td><td class="num">${fmt(r.Pf,2)}</td><td class="num">${fmt(r.Pl,2)}</td><td class="num">${fmt(r.Pt,2)}</td><td><button class="ghost" onclick="trechos.splice(${i},1);calcular()">x</button></td></tr>`});html+=`<tr><th colspan="8">Totais</th><th>${fmt(p.totalPf,2)}</th><th>${fmt(p.totalPl,2)}</th><th>${fmt(p.total,2)}</th><th>Pa</th></tr>`;qs('tblPressao').innerHTML=html}
+function addTrecho(){trechos.push({de:'Novo',para:'Novo',W:n('dutoW'),H:n('dutoH'),L:4.3,C:.3});calcular()}
+function renderRelatorio(b,p,x){qs('relatorioConteudo').innerHTML=`<h3>Dados da edificação</h3><table><tr><th>Endereço</th><td>${qs('endereco').value}</td></tr><tr><th>Descrição</th><td>${qs('descricao').value}</td></tr><tr><th>Ocupação</th><td>${qs('ocupacao').value}</td></tr><tr><th>Altura</th><td>${fmt(n('altura'),2)} m</td></tr><tr><th>Pavimentos pressurizados</th><td>${fmt(n('pcfPav')+n('npi'),0)} un</td></tr></table><h3>Resumo do cálculo</h3><table><tr><th>Parâmetro</th><th>Valor</th><th>Unidade</th></tr><tr><td>NPI</td><td>${fmt(b.npi,0)}</td><td>un</td></tr><tr><td>NPS</td><td>${fmt(b.nps,0)}</td><td>un</td></tr><tr><td>NPA</td><td>${fmt(b.npa,0)}</td><td>un</td></tr><tr><td>Área de escape A</td><td>${fmt(b.A,4)}</td><td>m²</td></tr><tr><td>QFT</td><td>${fmt(b.qft,3)}</td><td>m³/s</td></tr><tr><td>QAT</td><td>${fmt(b.qat,3)}</td><td>m³/s</td></tr><tr><td>Fator de segurança total</td><td>${fmt(b.fsTotal,2)}</td><td>-</td></tr><tr><td>Vazão adotada</td><td>${fmt(b.qAdotada,0)}</td><td>m³/h</td></tr><tr><td>Perda total no duto</td><td>${fmt(p.total,2)}</td><td>Pa</td></tr><tr><td>Pressão total necessária</td><td>${fmt(x.total,2)}</td><td>Pa</td></tr><tr><td>Ventilador adotado</td><td>${fmt(n('pressaoVent'),0)} Pa / ${fmt(n('potencia'),1)} CV</td><td></td></tr><tr><td>Força de abertura</td><td>${fmt(x.forca,2)}</td><td>N - ${x.status}</td></tr></table><p class="note">Observação: esta página reproduz a lógica principal da planilha enviada. Recomenda-se validar os critérios normativos e premissas de projeto antes de emissão final.</p>`}
+window.onload=init;
+</script>
 </body>
 </html>
