@@ -1,80 +1,32 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Em Desenvolvimento</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-:root{
---primary:#0f4fbf;--dark:#0b2d75;--bg:#f4f7fb;--card:#fff;
---text:#172033;--muted:#607086;--border:#d8dee9;
-}
-body{background:var(--bg);color:var(--text)}
-.app-nav{position:sticky;top:0;z-index:999;background:linear-gradient(135deg,var(--primary),var(--dark));box-shadow:0 8px 24px rgba(15,23,42,.16)}
-.app-nav-inner{max-width:1300px;margin:auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:14px}
-.brand{color:#fff;text-decoration:none;font-size:18px;font-weight:800}
-.nav-links{display:flex;gap:8px;flex-wrap:wrap}
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DieselCalc | Dimensionamento de armazenamento de diesel</title><style>
+:root{--bg:#f4f7fb;--card:#fff;--primary:#0f4fbf;--dark:#0b2d75;--text:#172033;--muted:#607086;--border:#d8dee9;--ok:#15803d;--bad:#b91c1c;--warn:#b45309;--soft:#eef3ff;--sel:#dcfce7;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:var(--text);background:var(--bg)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+.app-nav{position:sticky;top:0;z-index:999;background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;box-shadow:0 8px 24px rgba(15,23,42,.16)}
+.app-nav-inner{max-width:1300px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.app-nav .brand{color:#fff;text-decoration:none;font-weight:800;letter-spacing:.2px;font-size:18px;white-space:nowrap}
+.nav-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .nav-links a{color:#eaf1ff;text-decoration:none;font-weight:700;font-size:13px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
 .nav-links a:hover,.nav-links a.active{background:#fff;color:var(--dark)}
-.container{max-width:1300px;margin:35px auto;padding:0 16px}
-.card{
-background:var(--card);
-border:1px solid var(--border);
-border-radius:18px;
-box-shadow:0 8px 22px rgba(15,23,42,.06);
-padding:70px 30px;
-text-align:center;
-}
-.icon{font-size:72px;margin-bottom:20px}
-h1{font-size:40px;color:var(--dark);margin-bottom:15px}
-p{font-size:18px;color:var(--muted);max-width:700px;margin:auto;line-height:1.7}
-.progress{
-margin:40px auto 20px;
-width:320px;
-height:12px;
-background:#dbe5f2;
-border-radius:999px;
-overflow:hidden;
-}
-.progress span{
-display:block;
-height:100%;
-width:35%;
-background:linear-gradient(90deg,#0f4fbf,#4b8dff);
-animation:move 2s ease-in-out infinite alternate;
-}
-@keyframes move{
-from{width:25%}
-to{width:70%}
-}
-.btn{
-display:inline-block;
-margin-top:35px;
-padding:12px 26px;
-border-radius:12px;
-background:#0f4fbf;
-color:#fff;
-text-decoration:none;
-font-weight:bold;
-}
-.btn:hover{filter:brightness(.95)}
-footer{
-margin-top:30px;
-font-size:13px;
-color:#7b8794;
-}
-@media(max-width:700px){
-.app-nav-inner{flex-direction:column;align-items:flex-start}
-h1{font-size:30px}
-p{font-size:16px}
-.progress{width:100%}
-}
-</style>
-</head>
-<body>
-
-<nav class="app-nav">
+.shell{max-width:1300px;margin:0 auto;padding:0 16px 36px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+header.top{background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:24px 22px;border-radius:0 0 16px 16px;margin:0 -16px 18px}
+header.top p{color:#eaf1ff;max-width:820px;margin:6px 0 0}header.top .eyebrow{color:#dbeafe;letter-spacing:.12em;font-weight:800;font-size:11px}
+h1{font-size:28px;margin:6px 0}h2{font-size:19px;margin:0 0 15px;color:var(--dark)}h3{font-size:16px;margin:0 0 12px;color:var(--dark)}p{color:var(--muted);line-height:1.55}
+.pill{display:inline-block;border:1px solid rgba(255,255,255,.48);border-radius:30px;padding:6px 11px;color:#fff;font-size:12px;vertical-align:middle;font-weight:600}
+.actions{display:flex;gap:8px;flex-wrap:wrap}button,.tab{background:var(--primary);color:#fff;border:1px solid var(--primary);border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700;font-family:inherit;font-size:13px}button:hover,.tab:hover{filter:brightness(.94)}.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+header.top .actions button{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.36);color:#fff}header.top .actions button:hover{background:rgba(255,255,255,.23)}
+.nav{display:flex;gap:8px;overflow:auto;margin:18px 0;padding:0 0 8px;border-bottom:1px solid var(--border)}.nav .tab{flex:0 0 auto;background:#fff;color:var(--dark);border-color:var(--border);border-radius:999px}.nav .tab.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(15,79,191,.16)}
+.pane{display:none}.pane.active{display:block}.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(310px,1fr);gap:16px}.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:15px;box-shadow:0 8px 22px rgba(15,23,42,.06)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.field{display:flex;flex-direction:column;gap:6px;min-width:0}.field label{font-size:12px;color:var(--text);font-weight:700}.field input,.field select,.field textarea{width:100%;padding:10px 11px;border:1px solid var(--border);background:#fff;border-radius:10px;color:var(--text);font:inherit;font-size:14px}.field input:focus,.field select:focus{outline:2px solid #93c5fd;border-color:var(--primary)}.help{font-size:11px;color:var(--muted)}
+.metricgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:16px}.metric strong{font-size:24px;display:block;color:var(--text);margin-top:7px;overflow-wrap:anywhere}.metric span{font-size:12px;color:var(--muted)}
+.note{background:#eff6ff;border:1px solid #bfdbfe;border-left:4px solid var(--primary);padding:12px 14px;border-radius:12px;margin:12px 0;color:#1e40af;line-height:1.55;font-size:12px}.note.warn{border-color:#fed7aa;border-left-color:var(--warn);background:#fff7ed;color:#7c2d12}.note.danger{border-color:#fecaca;border-left-color:var(--bad);background:#fef2f2;color:#991b1b}.note.ok{border-color:#bbf7d0;border-left-color:var(--ok);background:#f0fdf4;color:#166534}
+.small{font-size:12px}.tablewrap{overflow:auto;border:1px solid var(--border);border-radius:12px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid var(--border);text-align:left;padding:10px 7px;vertical-align:middle}th{background:var(--soft);color:var(--dark);font-weight:700;position:sticky;top:0}td input,td select{width:78px!important;padding:7px!important;background:white;color:var(--text);border:1px solid var(--border);border-radius:7px}td input.name{width:130px!important}
+.status{font-size:11px;font-weight:800;border-radius:999px;padding:4px 8px;display:inline-block}.pending{color:var(--warn);background:#fef3c7}.done{color:var(--ok);background:#dcfce7}.footer{color:var(--muted);font-size:12px;margin:30px 0}.check{display:flex;align-items:flex-start;gap:10px;margin:13px 0;color:var(--text);line-height:1.5}.check input{margin-top:3px;accent-color:var(--primary)}.tag{color:var(--primary);font-size:11px}.muted{color:var(--muted)}.full{grid-column:1/-1}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.app-nav-inner{align-items:flex-start;flex-direction:column}.nav-links{justify-content:flex-start}}
+@media(max-width:760px){.nav-links a{font-size:12px;padding:7px 9px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){.grid,.grid.two,.metricgrid{grid-template-columns:1fr}.shell{padding:0 13px 24px}header.top{margin:0 -13px 14px}h1{font-size:24px}.card{padding:15px}}
+@media print{@page{size:A4;margin:12mm}:root,body{background:#fff!important;color:#111!important}.app-nav,.nav,.actions,button{display:none!important}.shell{max-width:none;padding:0}.top{color:#111!important;background:#fff!important}.top p,.top .eyebrow{color:#333!important}.pill{color:#111!important;border-color:#aaa}.card,.metric{background:#fff!important;box-shadow:none!important;border:1px solid #bbb;break-inside:avoid}.pane{display:block!important;break-before:page}.pane:first-of-type{break-before:auto}.field input,.field select{background:#fff!important;color:#111!important}.metric strong{color:#111!important}p,.muted,.field label{color:#333!important}.layout{grid-template-columns:1fr 1fr}.note{color:#333!important;background:#fff!important}}
+</style></head><body><nav class="app-nav">
   <div class="app-nav-inner">
     <a class="brand" href="home.html">Seletores AVAC</a>
     <div class="nav-links">
@@ -84,39 +36,40 @@ p{font-size:16px}
       <a href="Sala_de_Cirurgia.html">Sala de Cirurgia</a>
       <a href="Arquitetura.html">Arquitetura</a>
       <a href="ventilacao_subestacao.html">Ventilação de Subestação</a>
-      <a href="Diesel.html">Diesel</a>
+      <a href="Diesel.html" class="active" aria-current="page">Diesel</a>
       <a href="Exaustao_Cozinha.html">Exaustão de Cozinha</a>
       <a href="GLP e GN.html">GLP e GN</a>
       <a href="Linha de Vida.html">Linha de Vida</a>
-      <a href="Plano_Higgs.html">Plano de higgs</a>
+      <a href="Plano_Higgs.html">Plano de Rigging</a>
       <a href="Pressurizacao.html">Pressurização Escada</a>
 
     </div>
-</div>
-</nav>
 
-<div class="container">
-<div class="card">
-<div class="icon">🚧</div>
-<h1>Em Desenvolvimento</h1>
 
-<p>
-Esta ferramenta está sendo desenvolvida e em breve estará disponível
-com todos os recursos integrados ao conjunto de Seletores AVAC.
-</p>
-
-<div class="progress">
-<span></span>
-</div>
-
-<a class="btn" href="index.html">Voltar para a página inicial</a>
-
-<footer>
-Versão em desenvolvimento • Triarck Engenharia
-</footer>
-
-</div>
-</div>
-
-</body>
-</html>
+  </div>
+</nav><main class="shell"><header class="top"><div><div class="eyebrow">FERRAMENTA DE ENGENHARIA • VERSÃO 1.0</div><h1>DieselCalc <span class="pill">NBR 17505-2:2015</span></h1><p>Memória de cálculo interativa baseada nas abas de classificação, recirculação, alimentação por gravidade e vazão de grupos da planilha DIESEL-R00.</p></div><div class="actions"><button onclick="save()">Salvar neste navegador</button><button onclick="download()">Exportar dados JSON</button><button onclick="window.print()">Imprimir / PDF</button><button onclick="reset()">Restaurar exemplo</button></div></header><div class="note warn"><b>Uso técnico:</b> resultados são auxiliares de pré-dimensionamento, não certificam conformidade. A classificação depende da FISPQ, as distâncias dependem da configuração e os respiros dependem do projeto e do fabricante. A norma anexada é a edição de 2015; verificar edição e exigências legais aplicáveis.</div>
+<nav class="nav" id="nav"><button class="tab active" data-tab="geral">01 · Dados & autonomia</button><button class="tab" data-tab="bacia">02 · Contenção</button><button class="tab" data-tab="hidraulica">03 · Tubulações & bomba</button><button class="tab" data-tab="respiro">04 · Respiros</button><button class="tab" data-tab="checklist">05 · Conformidade</button><button class="tab" data-tab="origem">06 · Origem dos dados</button></nav>
+<section class="pane active" id="geral"><div class="layout"><div><article class="card"><h2>Dados do empreendimento e fluido</h2><div class="grid"><div class="field"><label>Empreendimento</label><input data-key="site" value="Hospitalar"></div><div class="field"><label>Fluido</label><input data-key="fluid" value="Óleo Diesel S10"></div><div class="field"><label>Ponto de fulgor (°C)</label><input type="number" step="0.1" data-key="flash" value="38"></div><div class="field"><label>Tipo de tanque principal</label><select data-key="tankType"><option value="sub">Subterrâneo</option><option value="surface">Superfície</option></select></div><div class="field"><label>Capacidade nominal principal (L)</label><input type="number" min="0" data-key="mainTank" value="4000"></div><div class="field"><label>Volume utilizável do principal (%)</label><input type="number" min="0" max="100" data-key="mainUseful" value="100"></div><div class="field"><label>Lençol freático (m, profundidade)</label><input type="number" step="0.1" data-key="water" value="1"></div><div class="field"><label>Material do tanque</label><input data-key="material" value="Aço carbono"></div><div class="field"><label>Classe do líquido (validar FISPQ)</label><select data-key="class"><option>II</option><option>IIIA</option><option>IIIB</option><option>IA</option><option>IB</option><option>IC</option></select></div></div><div class="note"></div></article><article class="card"><h2>Consumo e autonomia</h2><div class="grid"><div class="field"><label>Geradores (un.)</label><input type="number" min="1" data-key="gens" value="1"></div><div class="field"><label>Potência por gerador (kVA)</label><input type="number" data-key="kva" value="750"></div><div class="field"><label>Consumo por gerador (L/h)</label><input type="number" min="0" step="0.1" data-key="cons" value="144"></div><div class="field"><label>Autonomia desejada (h)</label><input type="number" min="0" data-key="hours" value="24"></div><div class="field"><label>Tanque incorporado por gerador (L)</label><input type="number" min="0" data-key="dayTank" value="600"></div><div class="field"><label>Volume utilizável do incorporado (%)</label><input type="number" min="0" max="100" data-key="dayUseful" value="100"></div></div><div class="note warn"></div></article></div><aside><article class="card"><h2>Resultados automáticos</h2><div class="metricgrid"><div class="metric"><span>Consumo total</span><strong id="rConsumption">—</strong></div><div class="metric"><span>Volume necessário total</span><strong id="rRequired">—</strong></div><div class="metric"><span>Volume externo requerido</span><strong id="rExternal">—</strong></div><div class="metric"><span>Autonomia disponível</span><strong id="rAutonomy">—</strong></div><div class="metric"><span>Margem de autonomia</span><strong id="rMargin">—</strong></div><div class="metric"><span>Classe pela temperatura de fulgor</span><strong id="rClass">—</strong></div></div><div id="rGeneralNote" class="note"></div></article><article class="card"><h3>Equações</h3><p>Consumo total = quantidade × consumo individual.</p><p>Volume requerido = consumo total × autonomia desejada.</p><p>Volume externo requerido = máximo (0, volume requerido − volume utilizável incorporado).</p><p>Autonomia = (volume útil principal + incorporado) ÷ consumo total.</p></article></aside></div></section>
+<section class="pane" id="bacia"><div class="layout"><div><article class="card"><h2>Bacia de contenção por dique</h2><p>Para tanques horizontais de superfície, o item 5.9.2.2 estabelece contenção do volume de <b>todos</b> os tanques horizontais e sobrealtura de 0,20 m. O cálculo abaixo considera bacia retangular e deslocamento geométrico aproximado dos tanques.</p><div class="grid"><div class="field"><label>Tanques horizontais na bacia (un.)</label><input type="number" min="1" data-key="basinN" value="1"></div><div class="field"><label>Volume nominal de cada tanque (L)</label><input type="number" min="0" data-key="basinTank" value="500"></div><div class="field"><label>Comprimento interno da bacia (m)</label><input type="number" step="0.01" data-key="basinL" value="3.2"></div><div class="field"><label>Largura interna da bacia (m)</label><input type="number" step="0.01" data-key="basinW" value="5.3"></div><div class="field"><label>Altura interna do dique (m)</label><input type="number" step="0.01" data-key="basinH" value="1.2"></div><div class="field"><label>Deslocamentos abaixo do nível de líquido (L)</label><input type="number" min="0" data-key="displacement" value="0"></div></div><div class="note warn">O deslocamento deve incluir partes imersas de tanques, bases e obstáculos. O valor inicial 0 L <b>não está validado</b>. Para tanque horizontal, o volume geométrico externo do tanque não é automaticamente igual ao volume deslocado na altura de contenção.</div></article><article class="card"><h3>Verificações construtivas — NBR 17505-2, 5.9.2</h3><div class="grid two"><div class="field"><label>Declividade real do piso (%)</label><input type="number" step="0.1" data-key="slope" value="1"></div><div class="field"><label>Distância dique ao limite da propriedade (m)</label><input type="number" step="0.1" data-key="propertyDist" value="0"></div></div><p class="small">Item 5.9.2.1: declividade mínima de 1% nos trechos aplicáveis. Item 5.9.2.3: afastamento da parede externa do dique ao limite da propriedade: 1,5 m para instalações até 60.000 L e 3,0 m acima disso, nas condições previstas. Outros afastamentos continuam aplicáveis.</p></article></div><aside><article class="card"><h2>Capacidade estimada</h2><div class="metricgrid"><div class="metric"><span>Volume nominal contido</span><strong id="rBasinTotal">—</strong></div><div class="metric"><span>Volume útil estimado da bacia</span><strong id="rBasinUseful">—</strong></div><div class="metric"><span>Altura para líquido + deslocamentos</span><strong id="rLiquidH">—</strong></div><div class="metric"><span>Altura requerida com 0,20 m</span><strong id="rReqH">—</strong></div></div><div id="rBasinStatus" class="note"></div><p class="small">Modelo simplificado: H<sub>líquido</sub> = (volume total + deslocamentos) / área da bacia; H<sub>mínima</sub> = H<sub>líquido</sub> + 0,20 m. Considera fundo plano e não substitui estudo geométrico real, drenagem e chuva.</p></article></aside></div></section>
+<section class="pane" id="hidraulica"><article class="card"><h2>Dimensionamento hidráulico — Darcy–Weisbach</h2><p>Substitui as referências quebradas das abas “BOMBA DE RECIRCULAÇÃO”, “ALIMENTAÇÃO GRAVIDADE - TER” e “VAZÃO GRUPO”. O cálculo usa diâmetro <b>interno real</b>, viscosidade cinemática e perdas localizadas por coeficiente K ou comprimento equivalente informado.</p><div class="grid"><div class="field"><label>Vazão total de projeto (L/h)</label><input type="number" min="0" data-key="flow" value="144"></div><div class="field"><label>Viscosidade cinemática (m²/s)</label><input type="number" min="0" step="0.0000001" data-key="nu" value="0.0000035"></div><div class="field"><label>Rugosidade absoluta (mm)</label><input type="number" min="0" step="0.001" data-key="rough" value="0.045"></div><div class="field"><label>Densidade do diesel (kg/m³)</label><input type="number" min="0" data-key="rho" value="840"></div><div class="field"><label>Desnível geométrico a vencer (m)</label><input type="number" step="0.1" data-key="head" value="1.8"></div><div class="field"><label>Margem adicional de projeto (%)</label><input type="number" min="0" data-key="pumpMargin" value="10"></div></div><div class="note">Dados iniciais de viscosidade e rugosidade foram extraídos da planilha de recirculação; densidade de 840 kg/m³ é <b>hipótese de cálculo</b>, a confirmar. Vazão inicial de 144 L/h vem da aba de classificação, não das abas hidráulicas (que trazem 150/151 L/h por gerador e até seis unidades).</div></article><article class="card"><div class="top"><h3>Trechos da rede</h3><button onclick="addPipe()">+ Adicionar trecho</button></div><div class="tablewrap"><table><thead><tr><th>Trecho</th><th>Compr. real (m)</th><th>Diâm. interno (mm)</th><th>K total</th><th>Compr. equiv. (m)</th><th>Vel. (m/s)</th><th>Re</th><th>Fator f</th><th>Perda (m)</th><th></th></tr></thead><tbody id="pipes"></tbody></table></div><p class="small">K total: soma dos coeficientes de conexões e válvulas, a obter de documentação técnica. Comprimento equivalente é alternativa às perdas localizadas por K: <b>não contabilize a mesma peça nos dois campos.</b> Para 2.300 ≤ Re ≤ 4.000, o regime é de transição e o resultado é apenas indicativo.</p></article><div class="layout"><article class="card"><h2>Resultados da linha</h2><div class="metricgrid"><div class="metric"><span>Vazão</span><strong id="rFlow">—</strong></div><div class="metric"><span>Perdas de carga</span><strong id="rLoss">—</strong></div><div class="metric"><span>Altura manométrica com margem</span><strong id="rHmt">—</strong></div><div class="metric"><span>Pressão diferencial estimada</span><strong id="rPressure">—</strong></div></div><div id="rHydroNote" class="note"></div></article><article class="card"><h3>Critérios de interpretação</h3><p>Para bomba: HMT ≈ desnível geométrico + perdas distribuídas e localizadas; acrescenta-se a margem configurada.</p><p>Para alimentação por gravidade: compare a carga estática disponível com a perda de carga total, considerando também pressões nos extremos e condições operacionais.</p><p>Esta ferramenta <b>não</b> dimensiona potência do motor, NPSH, cavitação, curva da bomba, retorno de combustível nem válvulas de segurança.</p><p class="tag">Referência complementar: ABNT NBR 17505-3 (não anexada).</p></article></div></section>
+<section class="pane" id="respiro"><div class="layout"><div><article class="card"><h2>Respiro normal</h2><div class="grid two"><div class="field"><label>Maior diâmetro interno de entrada/saída (mm)</label><input type="number" min="0" data-key="nozzle" value="25"></div><div class="field"><label>Dimensionamento API 2000 realizado?</label><select data-key="api"><option value="no">Não</option><option value="yes">Sim, documentado</option></select></div></div><div class="note">NBR 17505-2, 4.2.3.3: alternativa ao dimensionamento pela API 2000 — respiro normal com diâmetro interno pelo menos igual ao da entrada/saída do produto e nunca inferior a 32 mm. O valor indicado abaixo <b>não é seleção automática</b> de componente comercial.</div><div class="metric"><span>Diâmetro interno mínimo pela alternativa do item 4.2.3.3</span><strong id="rVentMin">—</strong></div></article><article class="card"><h2>Alívio de emergência — Tabela A.1</h2><p>Somente para avaliação preliminar quando a Tabela A.1 for aplicável. Informe a <b>área molhada do tanque</b> exposta ao incêndio, não a área de paredes e piso da bacia.</p><div class="grid two"><div class="field"><label>Área molhada calculada (m²)</label><input type="number" min="0" step="0.01" data-key="wetArea" value="0"></div><div class="field"><label>Pressão de operação (kPa manométricos)</label><input type="number" min="0" step="0.1" data-key="opPressure" value="0"></div></div><div class="note warn">A pressão admissível e a regulagem do dispositivo devem seguir a norma construtiva e documentação do tanque (4.2.2 e 5.5). Não usar 17,2 kPa da planilha como regulagem padrão.</div></article></div><aside><article class="card"><h2>Resultado da Tabela A.1</h2><div class="metric"><span>Vazão de ar livre requerida, por interpolação</span><strong id="rEmergency">—</strong></div><div id="rVentNote" class="note"></div><p class="small">Pontos transcritos da Tabela A.1 da edição anexada; interpolação linear entre pontos tabulados conforme nota 2. Fora da faixa ou sem área informada, o resultado permanece pendente. A conversão para diâmetro/dispositivo requer critérios adicionais.</p></article></aside></div></section>
+<section class="pane" id="checklist"><article class="card"><h2>Lista de verificação normativa</h2><p>Marque somente após conferir projeto, desenhos e documentação técnica. O estado é salvo no navegador ao clicar em “Salvar”.</p><div id="checks"></div><div id="rChecks" class="note"></div></article></section>
+<section class="pane" id="origem"><article class="card"><h2>Rastreabilidade com a planilha original</h2><div class="tablewrap"><table><thead><tr><th>Aba de origem</th><th>Informações aproveitadas</th><th>Tratamento nesta ferramenta</th></tr></thead><tbody><tr><td>CLASSIFICAÇÃO DO ÓLEO</td><td>Diesel S10, PF 38 °C, 750 kVA, 144 L/h, 24 h, tanque 600 L, principal 4.000 L, bacia 3,2 × 5,3 × 1,2 m</td><td>Entradas editáveis, cálculo de autonomia e contenção revisado</td></tr><tr><td>BOMBA DE RECIRCULAÇÃO</td><td>Trechos sucção/recalque, rugosidade 0,045 mm, viscosidade 3,5×10⁻⁶ m²/s, bomba 1,5 m³/h</td><td>Calculadora hidráulica genérica independente, sem reaproveitar fórmulas quebradas</td></tr><tr><td>ALIMENTAÇÃO GRAVIDADE - TER</td><td>Trechos A–B, B–C, C–D, desnível de −3,2 m</td><td>Permite inserir trechos e desnível com sinal; verificar sentido e cargas</td></tr><tr><td>VAZÃO GRUPO</td><td>Configurações de seis, três e um gerador</td><td>Quantidade de geradores editável, sem presumir que todos pertençam ao projeto</td></tr><tr><td>G-GLP</td><td>Dados de GLP de outro sistema, com referências inválidas</td><td>Excluídos por não fazerem parte do dimensionamento de diesel</td></tr></tbody></table></div></article><article class="card"><h2>Limitações e fontes</h2><p>Base normativa: ABNT NBR 17505-2:2015 anexada, principalmente itens 4.1, 4.2.2, 4.2.3, 5.2, 5.5, 5.9.2, Seção 6 e Tabelas A.1, A.4 a A.10. Classificação: NBR 17505-1, citada pela norma. Sistemas de tubulações: NBR 17505-3, não fornecida.</p><p>A ferramenta não verifica automaticamente distâncias de afastamento, áreas de classificação elétrica, resistência ao fogo, seleção de respiros, dimensões de ancoragem do tanque subterrâneo nem requisitos locais do Corpo de Bombeiros. Esses itens dependem de dados adicionais e validação profissional.</p></article></section><div class="footer"></div></main>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], fmt=(v,d=2)=>Number.isFinite(v)?v.toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d}):'—', num=k=>Number($(`[data-key="${k}"]`)?.value||0), val=k=>$(`[data-key="${k}"]`)?.value, set=(id,v)=>$('#'+id).textContent=v;
+const initialPipes=[{name:'Sucção',length:9,diameter:26.64,k:0,eq:0},{name:'Recalque',length:45,diameter:26.64,k:0,eq:0}];let pipes=structuredClone(initialPipes);
+const checks=[['4.1.1','Temperatura de operação e classificação do diesel conferidas com a FISPQ'],['4.2.2','Norma construtiva, pressão de projeto e certificação de cada tanque confirmadas'],['4.2.3.3','Respiro normal dimensionado e documentado'],['5.5','Alívio de emergência verificado para tanque de superfície, quando aplicável'],['5.2 / A.4–A.10','Afastamentos do tanque de superfície e entre tanques verificados conforme tabela aplicável'],['5.9.2.1','Declividade e drenagem da bacia verificadas'],['5.9.2.2','Volume útil da bacia e sobrealtura de 0,20 m verificados'],['5.9.2.4–5.9.2.6','Estanqueidade, resistência hidrostática, acesso e válvulas de drenagem conferidos'],['6.2–6.6','Localização, cobertura, corrosão, lençol freático e ancoragem do tanque subterrâneo verificados'],['4.5.1','Proteção contra transbordamento verificada'],['NBR 17505-3','Dimensionamento das tubulações e acessórios validado pela norma específica'],['Projeto','Compatibilidade dos volumes de 500 L e 600 L esclarecida']];
+let checked={};function renderChecks(){ $('#checks').innerHTML=checks.map(([ref,label],i)=>`<label class="check"><input type="checkbox" data-check="${i}" ${checked[i]?'checked':''}><span><b class="tag">${ref}</b> — ${label}</span></label>`).join('');$$('[data-check]').forEach(e=>e.onchange=()=>{checked[e.dataset.check]=e.checked;calc()}) }
+function renderPipes(){ $('#pipes').innerHTML=pipes.map((p,i)=>`<tr><td><input class="name" data-p="${i}" data-prop="name" value="${p.name.replaceAll('"','&quot;')}"></td>${[['length',.01],['diameter',.01],['k',.01],['eq',.01]].map(([a,step])=>`<td><input type="number" min="0" step="${step}" data-p="${i}" data-prop="${a}" value="${p[a]}"></td>`).join('')}<td id="vel${i}">—</td><td id="re${i}">—</td><td id="f${i}">—</td><td id="loss${i}">—</td><td><button onclick="removePipe(${i})" title="Remover trecho">×</button></td></tr>`).join('');$$('[data-p]').forEach(e=>e.addEventListener('input',()=>{pipes[+e.dataset.p][e.dataset.prop]=e.dataset.prop==='name'?e.value:Number(e.value);calc()}));calc()}
+function addPipe(){pipes.push({name:'Trecho '+(pipes.length+1),length:5,diameter:26.64,k:0,eq:0});renderPipes()}function removePipe(i){pipes.splice(i,1);renderPipes()}
+const tableA1=[[1.9,597],[2.8,895],[3.7,1192],[4.6,1492],[5.6,1790],[6.5,2087],[7.4,2384],[8.4,2684],[9.3,2973],[11.1,3568],[13,4163],[14.9,4757],[16.7,5380],[18.6,5975],[23.2,6768],[27.9,7504],[32.5,8155],[37.2,8835],[46.5,10024],[55.7,11100],[65,12120],[74.3,13082],[83.6,13960],[92.9,14838],[111.5,15772],[130.1,16622],[148.6,17387],[167.2,18094],[185.8,18746],[223,19935],[260.1,21010]];
+function interp(x){if(x<tableA1[0][0]||x>tableA1.at(-1)[0])return null;for(let i=1;i<tableA1.length;i++){const [x1,y1]=tableA1[i-1],[x2,y2]=tableA1[i];if(x<=x2)return y1+(x-x1)*(y2-y1)/(x2-x1)}return null}
+function calc(){let q=num('gens')*num('cons'),needed=q*num('hours'),useDay=num('gens')*num('dayTank')*num('dayUseful')/100,useMain=num('mainTank')*num('mainUseful')/100,external=Math.max(0,needed-useDay),aut=q>0?(useMain+useDay)/q:NaN;set('rConsumption',fmt(q,1)+' L/h');set('rRequired',fmt(needed,0)+' L');set('rExternal',fmt(external,0)+' L');set('rAutonomy',fmt(aut,2)+' h');set('rMargin',fmt(aut-num('hours'),2)+' h');let flash=num('flash');set('rClass',flash<22.8?'I (IA/IB)*':flash<37.8?'IC':flash<60?'II':flash<93?'IIIA':'IIIB');$('#rGeneralNote').className='note '+(useMain+useDay>=needed?'ok':'danger');$('#rGeneralNote').textContent=(useMain+useDay>=needed?'Volume teórico suficiente para autonomia desejada.':'Volume utilizável insuficiente para a autonomia desejada.')+' Confirme volumes efetivamente utilizáveis, reserva, consumo em carga e simultaneidade.';
+let area=num('basinL')*num('basinW'),vol=num('basinN')*num('basinTank'),disp=num('displacement'),hl=area>0?(vol+disp)/1000/area:NaN,hr=hl+.2,usable=area*Math.max(0,num('basinH')-.2)*1000-disp;set('rBasinTotal',fmt(vol,0)+' L');set('rBasinUseful',fmt(usable,0)+' L');set('rLiquidH',fmt(hl,3)+' m');set('rReqH',fmt(hr,3)+' m');let basinOk=num('basinH')>=hr;$('#rBasinStatus').className='note '+(basinOk?'ok':'danger');$('#rBasinStatus').textContent=(basinOk?'Altura geométrica preliminar suficiente.':'Altura geométrica preliminar insuficiente.')+(num('displacement')===0?' Deslocamentos ainda não informados.':'')+(num('slope')<1?' Declividade inferior a 1%.':'')+(num('propertyDist')<1.5?' Afastamento informado inferior a 1,5 m; conferir item 5.9.2.3.':'')+' Não é aprovação da bacia.';
+let flow=num('flow')/3600000,nu=num('nu'),eps=num('rough')/1000,rho=num('rho'),sum=0,transition=false,invalid=false;pipes.forEach((p,i)=>{let d=p.diameter/1000,a=Math.PI*d*d/4,v=d>0?flow/a:NaN,re=nu>0?v*d/nu:NaN,f=re>0?(re<2300?64/re:Math.pow(-1.8*Math.log10(Math.pow(eps/d/3.7,1.11)+6.9/re),-2)):NaN;let h=(f*(p.length+p.eq)/d+p.k)*v*v/(2*9.80665);if(re>=2300&&re<=4000)transition=true;if(!Number.isFinite(h)||h<0)invalid=true;else sum+=h;set('vel'+i,fmt(v,3));set('re'+i,fmt(re,0));set('f'+i,fmt(f,4));set('loss'+i,fmt(h,3))});let total=num('head')+sum,hmt=Math.max(0,total)*(1+num('pumpMargin')/100);set('rFlow',fmt(num('flow')/1000,3)+' m³/h');set('rLoss',invalid?'Pendente':fmt(sum,3)+' mca');set('rHmt',invalid?'Pendente':fmt(hmt,3)+' mca');set('rPressure',invalid?'Pendente':fmt(hmt*rho*9.80665/1000,2)+' kPa');$('#rHydroNote').className='note '+(invalid||transition?'warn':'');$('#rHydroNote').textContent=invalid?'Preencha diâmetros internos positivos e viscosidade válida.':transition?'Há trechos em regime de transição (Re entre 2.300 e 4.000): fator de atrito indicativo.':'Resultado hidráulico preliminar. Verificar acessórios, NPSH, pressões terminais e condições reais.';
+set('rVentMin',fmt(Math.max(32,num('nozzle')),0)+' mm');let wet=num('wetArea'),em=wet>0?interp(wet):null;set('rEmergency',em===null?'Pendente':fmt(em,0)+' m³/h');$('#rVentNote').className='note '+(em===null?'warn':'');$('#rVentNote').textContent=em===null?'Informar área molhada válida entre 1,9 e 260,1 m²; fora dessa faixa, consultar procedimento aplicável.':'Interpolação da Tabela A.1 (área molhada '+fmt(wet,2)+' m²). Verificar aplicabilidade, reduções admitidas e seleção do dispositivo.';
+let count=Object.values(checked).filter(Boolean).length;$('#rChecks').textContent=count+' de '+checks.length+' verificações assinaladas. Itens não marcados permanecem pendentes.'}
+function snapshot(){let values={};$$('[data-key]').forEach(e=>values[e.dataset.key]=e.value);return {version:1,values,pipes,checked,generatedAt:new Date().toISOString()}}function restore(obj){if(!obj||!obj.values)return;$$('[data-key]').forEach(e=>{if(obj.values[e.dataset.key]!==undefined)e.value=obj.values[e.dataset.key]});if(Array.isArray(obj.pipes))pipes=obj.pipes;checked=obj.checked||{};renderChecks();renderPipes();calc()}
+function save(){localStorage.setItem('dieselcalc-v1',JSON.stringify(snapshot()));alert('Parâmetros salvos neste navegador.')}function download(){let blob=new Blob([JSON.stringify(snapshot(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='dieselcalc_projeto.json';a.click();URL.revokeObjectURL(url)}function reset(){if(confirm('Restaurar dados iniciais do exemplo?')){localStorage.removeItem('dieselcalc-v1');location.reload()}}
+$$('.tab').forEach(e=>e.onclick=()=>{$$('.tab').forEach(t=>t.classList.toggle('active',t===e));$$('.pane').forEach(p=>p.classList.toggle('active',p.id===e.dataset.tab))});$$('[data-key]').forEach(e=>e.addEventListener('input',calc));renderChecks();renderPipes();try{let s=localStorage.getItem('dieselcalc-v1');if(s)restore(JSON.parse(s))}catch(e){console.warn('Não foi possível carregar dados salvos',e)}calc();
+</script></body></html>
